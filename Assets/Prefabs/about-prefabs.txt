@@ -1,0 +1,78 @@
+PREFABS SUMMARY
+Last Updated: 02/09/2018
+
+
+1. DESPAWN SYSTEM
+
+1.1 Despawn Area
+- an invisible rectangular area which despawns any game objects on collision;
+- can be setup to be only triggered by game objects with a specific tag;
+
+1.2 Despawn Point
+- a visible black sphere which despawns any game objects on collision;
+- can be setup to be only triggered by game objects with a specific tag;
+
+
+
+2. DYNAMIC OBJECTS
+
+2.1 Blue Box
+- an interactable blue cube with a mass of 20 standard units;
+
+2.2 Green Box
+- an interactable green cube with a mass of 10 standard units;
+
+2.3 Red Box
+- an interactable red cube with a mass of 30 standard units;
+
+
+
+3. OTHER
+
+3.1 Teleport Area
+- a VR teleportation area used by SteamVR SDK;
+
+3.2 VR SDK
+- a complete collection of SteamVR and VRTK game objects and scripts;
+
+
+
+4. PORTAL SYSTEM
+
+4.1 Blue Portal
+- a visible blue sphere which triggers a custom event on collision with a target game object;
+- is triggered by all game objects with an "ID_BLUE" custom tag;
+
+4.2 Green Portal
+- a visible green sphere which triggers a custom event on collision with a target game object;
+- is triggered by all game objects with an "ID_GREEN" custom tag;
+
+4.3 Red Portal
+- a visible red sphere which triggers a custom event on collision with a target game object;
+- is triggered by all game objects with an "ID_RED" custom tag;
+
+
+
+5. SPAWN SYSTEM
+
+5.1 Button Base
+- an interactable game object structure which provides a pushable button functionality;
+- requires a custom event trigger script added to the "Button Trigger Event" child object;
+
+5.2 Spawn Point
+- a static game object structure which provides a spawn point visual indicator functionality;
+- requires the "Spawn Point Trigger" child object be referenced by a custom event trigger script;
+
+
+
+6. STATIC OBJECTS
+
+6.1 Main Floor
+- a static main floor game object;
+
+6.2 Round Table
+- a static round table game object;
+
+6.3 Side Wall
+- a static side wall game object;
+
