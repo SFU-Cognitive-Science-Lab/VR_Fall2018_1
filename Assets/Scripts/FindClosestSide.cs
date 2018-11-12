@@ -1,19 +1,27 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class FindClosestSide : MonoBehaviour {
     GameObject player;
-    string[] dirStrings = { "up", "right", "forward" };
+    int RIGHT = 0, UP = 1, FORWARD = 2, NOSIDE = 3;
+    string[] dirStrings = { "right", "up", "forward", "no side" };
     int previousNearestFace;
-    public bool detailedLogging = true;
+    public int thresholdAngle = 68;
+    public bool detailedLogging = false;
+    public Text angleDisplay;
+
+    public int measurements = 0;
 
     // Use this for initialization
     void Start () {
-        player = GameObject.FindGameObjectWithTag("Player");
+        player = GameObject.FindGameObjectWithTag("MainCamera"); // this responds to head movements, Player doesn't
+        // player = GameObject.FindGameObjectWithTag("ReferenceAngle"); // anything could have the ReferenceAngle tag
         Debug.Log("Player", player);
         previousNearestFace = -1;
-        detailedLogging = false;
     }
 	
 	// Update is called once per frame
@@ -24,24 +32,33 @@ public class FindClosestSide : MonoBehaviour {
             if (cube != null)
             {
                 Transform transform = cube.GetComponent<Transform>();
-                Vector3[] directions = { transform.up, transform.right, transform.forward };
-                float minAngle = 90.0F;
-                int nearestFace = 0;
-                int face = 0;
-                foreach (Vector3 direction in directions)
+                int[] angles = {
+                    (int) Math.Abs(Math.Round(Vector3.Angle(player.transform.forward, transform.right)) - 90.0),
+                    (int) Math.Abs(Math.Round(Vector3.Angle(player.transform.forward, transform.up)) - 90.0),
+                    (int) Math.Abs(Math.Round(Vector3.Angle(player.transform.forward, transform.forward)) - 90.0),
+                };
+                int max = angles.Max();
+                int visibleSide = NOSIDE;
+                // basic idea: is the cube face angled towards us enough for us to see it
+                // we also want to check if the player's head is rotated up or to the side too far
+                if (max > thresholdAngle  
+                    && player.transform.forward[UP] > -0.6 && player.transform.forward[UP] < 0.05
+                    && player.transform.forward[RIGHT] > -0.4 && player.transform.forward[RIGHT] < 0.4
+                )
                 {
-                    float angle = Vector3.Angle(player.transform.forward, direction);
-                    // if (detailedLogging) { 
-                        Debug.Log("testing face " + dirStrings[face] + " angle " + angle + " min " + minAngle + " min face " + dirStrings[nearestFace]);
-                    // }
-                    if (angle < minAngle) { minAngle = angle; nearestFace = face; }
-                    face++;
+                    visibleSide = angles.ToList().IndexOf(max);
                 }
-                if (previousNearestFace != nearestFace)
-                {
-                    Debug.Log(dirStrings[nearestFace] + " (" + nearestFace + ") is closest.");
-                    previousNearestFace = nearestFace;
-                }
+
+                if (detailedLogging && measurements % 20 == 0) angleDisplay.text = 
+                       "right " + player.transform.forward[RIGHT] 
+                       + " up " + player.transform.forward[UP]
+                       + "\n" + dirStrings[UP] + " " + angles[UP]
+                       + ", " + dirStrings[RIGHT] + " " + angles[RIGHT]
+                       + ", " + dirStrings[FORWARD] + " " + angles[FORWARD]
+                       + "\n" + dirStrings[visibleSide] + " is visible ";
+                       ;
+                measurements++;
+
             }
         }
 	}

@@ -5,7 +5,7 @@ public class CasterofRays : MonoBehaviour
 {
     // create a variable which allows us to specify which layers are interacted with
     public LayerMask mask;
-    public string ObjUnderReticle;
+    public static string ObjUnderReticle;
     string HitInfoString;
     
 
