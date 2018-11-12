@@ -6,7 +6,7 @@ public class FindClosestSide : MonoBehaviour {
     GameObject player;
     string[] dirStrings = { "up", "right", "forward" };
     int previousNearestFace;
-    bool detailedLogging = false;
+    public bool detailedLogging = true;
 
     // Use this for initialization
     void Start () {
@@ -31,9 +31,9 @@ public class FindClosestSide : MonoBehaviour {
                 foreach (Vector3 direction in directions)
                 {
                     float angle = Vector3.Angle(player.transform.forward, direction);
-                    if (detailedLogging) { 
+                    // if (detailedLogging) { 
                         Debug.Log("testing face " + dirStrings[face] + " angle " + angle + " min " + minAngle + " min face " + dirStrings[nearestFace]);
-                    }
+                    // }
                     if (angle < minAngle) { minAngle = angle; nearestFace = face; }
                     face++;
                 }
