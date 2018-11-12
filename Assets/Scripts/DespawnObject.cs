@@ -33,6 +33,7 @@ public class DespawnObject : MonoBehaviour {
     // OnTriggerEnter() event listener.
     private void OnTriggerEnter(Collider other)
     {
+        /*
         Transform otherTransform = other.transform;
         Transform parentTransform = otherTransform.parent;
 
@@ -58,6 +59,7 @@ public class DespawnObject : MonoBehaviour {
                 Destroy(parentTransform.gameObject);
             }
         }
+        */
     }
 
     // Detach all attached controller objects.

@@ -5,6 +5,8 @@ public class CasterofRays : MonoBehaviour
 {
     // create a variable which allows us to specify which layers are interacted with
     public LayerMask mask;
+    public string ObjUnderReticle;
+    string HitInfoString;
     
 
     void Update()
@@ -27,6 +29,10 @@ public class CasterofRays : MonoBehaviour
         {
             Debug.DrawLine(ray.origin, ray.origin + ray.direction * 100, Color.green);
         }
+
+        HitInfoString = HitInfo.collider + "";
+        ObjUnderReticle = HitInfoString;
+        // Debug.Log(HitInfoString);
     }
 }
 

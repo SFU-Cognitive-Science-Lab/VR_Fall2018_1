@@ -9,6 +9,10 @@ MonoImporter:
   - neutralMat: {fileID: 2100000, guid: d2d7533b051ef07409739afba063aafe, type: 2}
   - nextMat: {fileID: 2100000, guid: 6f642464f0211c044b29a8a0f20fe967, type: 2}
   - nextActiveMat: {fileID: 2100000, guid: b52c31a5290d6fd4e8c4315c02e60a1e, type: 2}
+  - noChoiceMat: {fileID: 2100000, guid: 1f48e45588972ec45b826e54a25727b6, type: 2}
+  - fallbackController: {instanceID: 0}
+  - leftController: {instanceID: 0}
+  - rightController: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
