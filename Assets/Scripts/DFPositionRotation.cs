@@ -16,10 +16,10 @@ class DFPositionRotation : DataFarmerObject {
         this.rotation = rotation;
     }
 
-    public override string Serialize()
+    public override string Serialize(long participant)
     {
-        return string.Format("{0},{1},{2},{3},{4},{5},{6}\n", 
-            timestamp, position.x, position.y, position.z, 
+        return string.Format("posrot,{0},{1},{2},{3},{4},{5},{6},{7}\n", 
+            participant, timestamp, position.x, position.y, position.z, 
             rotation.x,rotation.y,rotation.z);
     }
  }

@@ -1,4 +1,4 @@
 ﻿public interface IDataFarmerObject
 {
-    string Serialize();
+    string Serialize(long participant);
 }

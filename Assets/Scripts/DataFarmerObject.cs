@@ -1,5 +1,5 @@
 ﻿abstract class DataFarmerObject : IDataFarmerObject
 {
     long timestamp;
-    public abstract string Serialize();
+    public abstract string Serialize(long participant);
 }

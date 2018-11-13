@@ -24,7 +24,6 @@ public class ButtonDoStuff : MonoBehaviour {
     {
         camVR.GetComponent<CustomTag>().setTag(0, participantID.text);
         menu.SetActive(false);
-        //menu.gameObject.
     }
 
 }
