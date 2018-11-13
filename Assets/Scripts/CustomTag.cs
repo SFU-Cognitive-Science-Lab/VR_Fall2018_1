@@ -27,6 +27,10 @@ public class CustomTag : MonoBehaviour
     {
         return tags.Contains(tag);
     }
+    public void setTag(int index, string value)
+    {
+        tags[index] = value;
+    }
 
 /*[Methods to set and check (correct) tags for GameObjects]
 * 

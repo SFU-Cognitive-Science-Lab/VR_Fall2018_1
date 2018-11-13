@@ -134,18 +134,16 @@ public class ChoiceBehaviour : MonoBehaviour {
     }
 
     public void OnTriggerExit(Collider other)
-    {
+    {/*
         if (cTag == "NEXT" && firstChoice != true){
             ResetButtons();
-        }
+        }*/
     }
 
     private void ResetButtons()
     {
-        Debug.Log("Trace 2");
         //Despawn current box
         this.GetComponent<DespawnObject>().buttonDespawn();
-
         //Change Colors/underlying variables
         for(int i = 0; i < choices.Count; i++)
         {

@@ -12,7 +12,8 @@ public class applicator : MonoBehaviour {
     {
         rend = GetComponent<Renderer>();
         rend.enabled = true;
-        rend.materials = createSet(0, name.Replace("(Clone)", ""));
+        rend.materials = createSet(int.Parse(GameObject.FindGameObjectsWithTag("MainCamera")[0].GetComponent<CustomTag>().getTag(0)), name.Replace("(Clone)", ""));
+        Debug.Log("ID: " + int.Parse(GameObject.FindGameObjectsWithTag("MainCamera")[0].GetComponent<CustomTag>().getTag(0)));
     }
 
     void swap(ref int a, ref int b)
