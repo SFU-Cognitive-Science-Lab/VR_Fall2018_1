@@ -1,5 +1,13 @@
-﻿abstract class DataFarmerObject : IDataFarmerObject
+﻿public abstract class DataFarmerObject : IDataFarmerObject
 {
-    long timestamp;
+    // this variable tracks our current timestamp since intialization and serializes the participant value
+    readonly protected string tag;
+    protected float timestamp;
     public abstract string Serialize(long participant);
+
+    public DataFarmerObject(string tag, float timestamp)
+    {
+        this.tag = tag;
+        this.timestamp = timestamp;
+    }
 }

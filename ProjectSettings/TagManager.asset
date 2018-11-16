@@ -8,6 +8,7 @@ TagManager:
   - Interactable Object
   - Next
   - ReferenceAngle
+  - PartTextBox
   layers:
   - Default
   - TransparentFX

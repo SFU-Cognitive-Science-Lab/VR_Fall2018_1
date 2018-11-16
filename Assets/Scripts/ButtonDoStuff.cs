@@ -22,6 +22,8 @@ public class ButtonDoStuff : MonoBehaviour {
 
     public void action()
     {
+        participantID.text = DataFarmer.GetInstance().getParticipantAsString();
+
         camVR.GetComponent<CustomTag>().setTag(0, participantID.text);
         menu.SetActive(false);
     }

@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 using System;
-using System.Linq;
 using System.Text.RegularExpressions;
+
 
 public class DataExtractor : MonoBehaviour
 {
@@ -19,12 +19,17 @@ public class DataExtractor : MonoBehaviour
     private int writetofile = 0;
     private int DataCacheThreshhold = 1000;
     private int HeadersCount = 3;
+    private float distanceTravelled = 0;
+    private Vector3 previousPosition;
+    private double displacement;
+    private double rotations;
+    private double framecount = 0;
 
     // Use this for initialization
     void Start()
     {
-
-        // This linw creates a csv file on the specified path, assuming the folders already exist, and writes in the headers to be used
+        previousPosition = transform.position;
+        // This line creates a csv file on the specified path, assuming the folders already exist, and writes in the headers to be used
         string[] lines = { "hmd_x , hmd_y, hmd_z" };
         // WriteAllLines creates a file, writes a collection of strings to the file,
         // and then closes the file.  You do NOT need to call Flush() or Close().
@@ -38,9 +43,13 @@ public class DataExtractor : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        DataFarmer df = DataFarmer.GetInstance();
-        DFPositionRotation point = new DFPositionRotation(Time.time, transform.position, transform.rotation);
-        df.Save(point);
+        framecount++;
+        if (framecount % 100 == 0)
+        {
+            distanceTravelled += Vector3.Distance(transform.position, previousPosition);
+            DataFarmer.GetInstance().Save(new DFPositionRotation(Time.time, transform.position, transform.rotation, distanceTravelled));
+            previousPosition = transform.position;
+        }
 
         // Grab Vector3 Coordinates and Convert into string
         HMDxPos_string = transform.position.x + " ";
@@ -57,8 +66,6 @@ public class DataExtractor : MonoBehaviour
        
        var array = new List<string>();
         
-        
-
         array.Add(HMDxPos_string);
         array.Add(HMDyPos_string);
         array.Add(HMDzPos_string);

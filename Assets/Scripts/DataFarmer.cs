@@ -1,25 +1,37 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
-using System.Text;
 using UnityEngine;
 
 public class DataFarmer {
 
+    // 
     private static DataFarmer me = null;
+
+    // 
     private List<IDataFarmerObject> data = new List<IDataFarmerObject>();
-    private static int BUFFER_FULL = 100;
+
+    // SET BUFFER THRESHHOLD WHICH, WHEN MET, WILL STREAM DATA CHUNKS OUTWARD
+    private static int BUFFER_FULL = 10;
+
+    // Establish Webclient
     private WebClient webClient;
+
+    // Declare authorization code
     private string auth;
+
+    // Declare Participant Subject ID
     private long participant = -1;
+
+
     // TODO: put this stuff in a config file
-    // this is a webservice that is now running - i.e. we can save data remotely
+    // This is a webservice that is now running - i.e. we can save data remotely
     private static string REMOTE_URI = "http://cslab.psyc.sfu.ca:13524";
     private static string REMOTE_SECRET = "doorcode";
 
-	// Use this for initialization
+
+    // Use this for initialization - Creates a "virtual" game object.
 	public static DataFarmer GetInstance () {
 		if (me == null)
         {
@@ -32,6 +44,8 @@ public class DataFarmer {
     {
         using (webClient = new WebClient())
         {
+            
+            
             // example of getting a participant id automatically
             // TODO: grab a human entered participant id
             // you can just log in with /login/<key> rather than /new/<key>
@@ -47,7 +61,10 @@ public class DataFarmer {
             {
                 Debug.Log(e.Message);
             }
-            // TODO: there is probably an easier way to do this
+            
+            
+            
+            // TODO: there is probably an easier way to do this - I'm not sure what this seciton is aiming to do.
             WebHeaderCollection headers = webClient.ResponseHeaders;
             int i = 0;
             for (; i < headers.Count; i++)
@@ -60,20 +77,39 @@ public class DataFarmer {
                     break;
                 }
             }
+            // end web connection?
             webClient.Dispose();
         }
 
     }
 
+    public string getParticipantAsString()
+    {
+        return participant.ToString();
+    }
+
+    public long getParticipant()
+    {
+        return participant;
+    }
+
+    // Saving the Data Chunk to File
 	public void Save (IDataFarmerObject thingToSave) {
+        
+        // Since this section is called every frame, the data.add line will continue to receive a new line of data on every iteration until the BUFFER is reached
         data.Add(thingToSave);
+        
         if (data.Count == BUFFER_FULL)
         {
+
+            // Serialize data structure
             string dataString = "";
             foreach (IDataFarmerObject o in data)
             {
                 dataString += o.Serialize(participant);
             }
+
+            // Report in console that data has been moved, and then update csv on file path
             Debug.Log("Data Moving to File!");
             using (StreamWriter file =
                    File.AppendText(@"C:\Users\CSLUser\Desktop\df.csv"))

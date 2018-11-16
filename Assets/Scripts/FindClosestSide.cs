@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,7 +7,7 @@ public class FindClosestSide : MonoBehaviour {
     GameObject player;
     int RIGHT = 0, UP = 1, FORWARD = 2, NOSIDE = 3;
     string[] dirStrings = { "right", "up", "forward", "no side" };
-    int previousNearestFace;
+    int previousSide;
     public int thresholdAngle = 68;
     public bool detailedLogging = false;
     public Text angleDisplay;
@@ -21,7 +19,7 @@ public class FindClosestSide : MonoBehaviour {
         player = GameObject.FindGameObjectWithTag("MainCamera"); // this responds to head movements, Player doesn't
         // player = GameObject.FindGameObjectWithTag("ReferenceAngle"); // anything could have the ReferenceAngle tag
         Debug.Log("Player", player);
-        previousNearestFace = -1;
+        previousSide = -1;
     }
 	
 	// Update is called once per frame
@@ -43,12 +41,18 @@ public class FindClosestSide : MonoBehaviour {
                 // we also want to check if the player's head is rotated up or to the side too far
                 if (max > thresholdAngle  
                     && player.transform.forward[UP] > -0.6 && player.transform.forward[UP] < 0.05
-                    && player.transform.forward[RIGHT] > -0.4 && player.transform.forward[RIGHT] < 0.4
+                    && player.transform.forward[RIGHT] < 0.4
                 )
                 {
                     visibleSide = angles.ToList().IndexOf(max);
                 }
 
+                if (visibleSide != previousSide)
+                {
+                    DataFarmer.GetInstance().Save(new DFFixation(Time.time, cube.name, dirStrings[visibleSide], CasterofRays.ObjUnderReticle, "unknown"));
+                    previousSide = visibleSide;
+                }
+                
                 if (detailedLogging && measurements % 20 == 0) angleDisplay.text = 
                        "right " + player.transform.forward[RIGHT] 
                        + " up " + player.transform.forward[UP]
@@ -58,7 +62,6 @@ public class FindClosestSide : MonoBehaviour {
                        + "\n" + dirStrings[visibleSide] + " is visible ";
                        ;
                 measurements++;
-
             }
         }
 	}

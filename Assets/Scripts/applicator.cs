@@ -10,6 +10,8 @@ public class applicator : MonoBehaviour {
     
     void Start()
     {
+        Cubes cubes = new Cubes();
+
         rend = GetComponent<Renderer>();
         rend.enabled = true;
         rend.materials = createSet(int.Parse(GameObject.FindGameObjectsWithTag("MainCamera")[0].GetComponent<CustomTag>().getTag(0)), name.Replace("(Clone)", ""));
