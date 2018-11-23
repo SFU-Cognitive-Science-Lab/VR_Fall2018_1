@@ -8,7 +8,7 @@ public class FindClosestSide : MonoBehaviour {
     int RIGHT = 0, UP = 1, FORWARD = 2, NOSIDE = 3;
     string[] dirStrings = { "right", "up", "forward", "no side" };
     int previousSide;
-    public int thresholdAngle = 68;
+    public int thresholdAngle = 58;
     public bool detailedLogging = false;
     public Text angleDisplay;
 
@@ -37,11 +37,14 @@ public class FindClosestSide : MonoBehaviour {
                 };
                 int max = angles.Max();
                 int visibleSide = NOSIDE;
-                // basic idea: is the cube face angled towards us enough for us to see it
+                // basic idea: is the cube face angled towards us enough for us to see it?
                 // we also want to check if the player's head is rotated up or to the side too far
                 if (max > thresholdAngle  
+                    /*
+                     * this fails to take into account if someone is looking up
                     && player.transform.forward[UP] > -0.6 && player.transform.forward[UP] < 0.05
                     && player.transform.forward[RIGHT] < 0.4
+                    */
                 )
                 {
                     visibleSide = angles.ToList().IndexOf(max);

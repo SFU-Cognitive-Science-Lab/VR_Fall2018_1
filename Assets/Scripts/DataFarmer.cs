@@ -27,7 +27,7 @@ public class DataFarmer {
 
     // TODO: put this stuff in a config file
     // This is a webservice that is now running - i.e. we can save data remotely
-    private static string REMOTE_URI = "http://cslab.psyc.sfu.ca:13524";
+    private static string REMOTE_URI = "https://cslab.psyc.sfu.ca:13524";
     private static string REMOTE_SECRET = "doorcode";
 
 
@@ -42,7 +42,7 @@ public class DataFarmer {
 
 	private DataFarmer()
     {
-        using (webClient = new WebClient())
+        using (webClient = getNewWebClient())
         {
             
             
@@ -123,7 +123,7 @@ public class DataFarmer {
                 // TODO: look at more sophisticated ways to to the requests e.g. https://social.msdn.microsoft.com/Forums/vstudio/en-US/33798503-2896-4850-aa4b-11022c2b3adf/how-can-i-send-webrequest-with-multiple-cookies?forum=csharpgeneral
                 if (participant > 0)
                 {
-                    using (webClient = new WebClient())
+                    using (webClient = getNewWebClient())
                     {
                         webClient.Headers.Add("Content-Type", "text/plain");
                         webClient.Headers.Add("Cookie", auth);
@@ -141,4 +141,10 @@ public class DataFarmer {
             data.Clear();
         }
 	}
+    private WebClient getNewWebClient()
+    {
+        // this line is needed for https to work with our self-signed certificates
+        ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
+        return new WebClient();
+    }
 }

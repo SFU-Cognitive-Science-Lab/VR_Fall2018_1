@@ -69,7 +69,7 @@ public class applicator : MonoBehaviour {
         are I1, P1-6 and so on. The combination is selected based on the subject number.
         */
 
-        int select = subject % 36; 
+        int select = 0; // subject % 36; 
 
         //initialize vars representing features and placements
         int F1x = 1;

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Cubes {
-    
     public Material[] material;
     /* material is an array containing the base and feature materials
     INITIAL MATERIAL ORDER
@@ -16,17 +15,17 @@ public class Cubes {
     [6] = Blue Upward Triangle
     */
     
-    void swap(ref int a, ref int b)
+    public void swap(int [] array, int pos1, int pos2)
     {
-        int temp = a;
-        a = b;
-        b = temp;
+        int temp = array[pos1];
+        array[pos1] = array[pos2];
+        array[pos2] = temp;
         return;
     }
 
     public Material[] createSet(int subject, string type, Renderer rend)
     {
-        Material[] matlist = rend.materials;
+
         /*
        MATLIST ORDER
        [0] = base
@@ -54,17 +53,11 @@ public class Cubes {
         as pairs (Ix, Py). E.g. the first 6 combinations will be I0, P1-6. The next six combinations
         are I1, P1-6 and so on. The combination is selected based on the subject number.
         */
-
+        int [] FeatureSet = { 1, 2, 3 };
+        // feature set values indicate feature set, indexes indicate feature number e.g. F1 = FS[0], FS[0] = 1 = red
+        Material[] matlist = rend.materials;
         int select = subject % 36;
-
-        //initialize vars representing features and placements
-        int F1x = 1;
-        int F1y = 2;
-        int F2x = 3;
-        int F2y = 4;
-        int F3x = 5;
-        int F3y = 6;
-
+        
         int[] face = { 1, 2, 3, 4, 5, 6 };
         /*
             [0] = right
@@ -73,14 +66,7 @@ public class Cubes {
             [3] = back
             [4] = top
             [5] = bottom
-
         */
-        int right = 1;
-        int front = 2;
-        int left = 3;
-        int back = 4;
-        int top = 5;
-        int bottom = 6;
 
         int c = 0;
         //This loop decides which set will belong to each feature
@@ -94,14 +80,12 @@ public class Cubes {
                 if (c % 2 == 0)
                 {
                     //Swap F1 with F2
-                    swap(ref F1x, ref F2x);
-                    swap(ref F1y, ref F2y);
+                    swap(FeatureSet, 0, 1);
                 }
                 else
                 {
                     //Swap F2 with F3
-                    swap(ref F2x, ref F3x);
-                    swap(ref F2y, ref F3y);
+                    swap(FeatureSet, 1, 2);
                 }
                 c++;
             }
@@ -115,14 +99,14 @@ public class Cubes {
             if (i % 2 == 0)
             {
                 //Swap Top/Bottom positions with Left/Right
-                swap(ref top, ref left);
-                swap(ref bottom, ref right);
+                swap(face, 4, 2);
+                swap(face, 5, 0);
             }
             else
             {
                 //Swap Left/Right positions with Front/Back
-                swap(ref left, ref front);
-                swap(ref right, ref back);
+                swap(face, 2, 1);
+                swap(face, 0, 3);
             }
         }
 
@@ -130,68 +114,68 @@ public class Cubes {
         switch (type)
         {
             case "A1":
-                matlist[front] = material[F1x];
-                matlist[back] = material[F1x];
-                matlist[left] = material[F2x];
-                matlist[right] = material[F2x];
-                matlist[top] = material[F3x];
-                matlist[bottom] = material[F3x];
+                matlist[face[0]] = material[FeatureSet[2]];
+                matlist[face[1]] = material[FeatureSet[0]];
+                matlist[face[2]] = material[FeatureSet[2]];
+                matlist[face[3]] = material[FeatureSet[0]];
+                matlist[face[4]] = material[FeatureSet[5]];
+                matlist[face[5]] = material[FeatureSet[5]];
                 break;
             case "A2":
-                matlist[front] = material[F1x];
-                matlist[back] = material[F1x];
-                matlist[left] = material[F2x];
-                matlist[right] = material[F2x];
-                matlist[top] = material[F3y];
-                matlist[bottom] = material[F3y];
+                matlist[face[0]] = material[FeatureSet[2]];
+                matlist[face[1]] = material[FeatureSet[0]];
+                matlist[face[2]] = material[FeatureSet[2]];
+                matlist[face[3]] = material[FeatureSet[0]];
+                matlist[face[4]] = material[FeatureSet[6]];
+                matlist[face[5]] = material[FeatureSet[6]];
                 break;
             case "B1":
-                matlist[front] = material[F1x];
-                matlist[back] = material[F1x];
-                matlist[left] = material[F2y];
-                matlist[right] = material[F2y];
-                matlist[top] = material[F3x];
-                matlist[bottom] = material[F3x];
+                matlist[face[0]] = material[FeatureSet[3]];
+                matlist[face[1]] = material[FeatureSet[0]];
+                matlist[face[2]] = material[FeatureSet[3]];
+                matlist[face[3]] = material[FeatureSet[0]];
+                matlist[face[4]] = material[FeatureSet[5]];
+                matlist[face[5]] = material[FeatureSet[5]];
                 break;
             case "B2":
-                matlist[front] = material[F1x];
-                matlist[back] = material[F1x];
-                matlist[left] = material[F2y];
-                matlist[right] = material[F2y];
-                matlist[top] = material[F3y];
-                matlist[bottom] = material[F3y];
+                matlist[face[0]] = material[FeatureSet[3]];
+                matlist[face[1]] = material[FeatureSet[0]];
+                matlist[face[2]] = material[FeatureSet[3]];
+                matlist[face[3]] = material[FeatureSet[0]];
+                matlist[face[4]] = material[FeatureSet[6]];
+                matlist[face[5]] = material[FeatureSet[6]];
                 break;
             case "C1":
-                matlist[front] = material[F1y];
-                matlist[back] = material[F1y];
-                matlist[left] = material[F2x];
-                matlist[right] = material[F2x];
-                matlist[top] = material[F3x];
-                matlist[bottom] = material[F3x];
+                matlist[face[0]] = material[FeatureSet[2]];
+                matlist[face[1]] = material[FeatureSet[1]];
+                matlist[face[2]] = material[FeatureSet[2]];
+                matlist[face[3]] = material[FeatureSet[1]];
+                matlist[face[4]] = material[FeatureSet[5]];
+                matlist[face[5]] = material[FeatureSet[5]];
                 break;
             case "C2":
-                matlist[front] = material[F1y];
-                matlist[back] = material[F1y];
-                matlist[left] = material[F2x];
-                matlist[right] = material[F2x];
-                matlist[top] = material[F3y];
-                matlist[bottom] = material[F3y];
+                matlist[face[0]] = material[FeatureSet[2]];
+                matlist[face[1]] = material[FeatureSet[1]];
+                matlist[face[2]] = material[FeatureSet[2]];
+                matlist[face[3]] = material[FeatureSet[1]];
+                matlist[face[4]] = material[FeatureSet[6]];
+                matlist[face[5]] = material[FeatureSet[6]];
                 break;
             case "D1":
-                matlist[front] = material[F1y];
-                matlist[back] = material[F1y];
-                matlist[left] = material[F2y];
-                matlist[right] = material[F2y];
-                matlist[top] = material[F3x];
-                matlist[bottom] = material[F3x];
+                matlist[face[0]] = material[FeatureSet[3]];
+                matlist[face[1]] = material[FeatureSet[1]];
+                matlist[face[2]] = material[FeatureSet[3]];
+                matlist[face[3]] = material[FeatureSet[1]];
+                matlist[face[4]] = material[FeatureSet[5]];
+                matlist[face[5]] = material[FeatureSet[5]];
                 break;
             case "D2":
-                matlist[front] = material[F1y];
-                matlist[back] = material[F1y];
-                matlist[left] = material[F2y];
-                matlist[right] = material[F2y];
-                matlist[top] = material[F3y];
-                matlist[bottom] = material[F3y];
+                matlist[face[0]] = material[FeatureSet[3]];
+                matlist[face[1]] = material[FeatureSet[1]];
+                matlist[face[2]] = material[FeatureSet[3]];
+                matlist[face[3]] = material[FeatureSet[1]];
+                matlist[face[4]] = material[FeatureSet[6]];
+                matlist[face[5]] = material[FeatureSet[6]];
                 break;
         }
         return matlist;

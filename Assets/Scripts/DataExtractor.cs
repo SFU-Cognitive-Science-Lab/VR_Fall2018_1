@@ -28,14 +28,9 @@ public class DataExtractor : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        // Hey Cal. Since this runs only on the initial startup of the program, the distance travelled variable is actually better described as net displacement from origin.
+        // If we were wanting to grab the distance between fixations, we would need a different calculation - RCAB
         previousPosition = transform.position;
-        // This line creates a csv file on the specified path, assuming the folders already exist, and writes in the headers to be used
-        string[] lines = { "hmd_x , hmd_y, hmd_z" };
-        // WriteAllLines creates a file, writes a collection of strings to the file,
-        // and then closes the file.  You do NOT need to call Flush() or Close().
-        File.WriteAllLines(@"C:\Users\CSLUser\Desktop\WriteLines.csv", lines);
-        // still need to insert a check here to verify that the file was actually created
-        Debug.Log("Extraction file succesfully created");
 
     }
 
