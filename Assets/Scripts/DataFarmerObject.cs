@@ -10,4 +10,12 @@
         this.tag = tag;
         this.timestamp = timestamp;
     }
+    public float GetTimestamp()
+    {
+        return timestamp;
+    }
+    public string GetTag()
+    {
+        return tag;
+    }
 }

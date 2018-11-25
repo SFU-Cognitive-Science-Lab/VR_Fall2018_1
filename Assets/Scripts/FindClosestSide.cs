@@ -8,7 +8,7 @@ public class FindClosestSide : MonoBehaviour {
     int RIGHT = 0, UP = 1, FORWARD = 2, NOSIDE = 3;
     string[] dirStrings = { "right", "up", "forward", "no side" };
     int previousSide;
-    public int thresholdAngle = 58;
+    public int thresholdAngle = 62;
     public bool detailedLogging = false;
     public Text angleDisplay;
 
@@ -52,7 +52,8 @@ public class FindClosestSide : MonoBehaviour {
 
                 if (visibleSide != previousSide)
                 {
-                    DataFarmer.GetInstance().Save(new DFFixation(Time.time, cube.name, dirStrings[visibleSide], CasterofRays.ObjUnderReticle, "unknown"));
+                    // the last Vector3 is a placeholder for the cumulative movement of the head and hand controllers
+                    DataFarmer.GetInstance().Save(new DFFixation(Time.time, cube.name, dirStrings[visibleSide], CasterofRays.ObjUnderReticle, Vector3.zero));
                     previousSide = visibleSide;
                 }
                 
@@ -62,7 +63,7 @@ public class FindClosestSide : MonoBehaviour {
                        + "\n" + dirStrings[UP] + " " + angles[UP]
                        + ", " + dirStrings[RIGHT] + " " + angles[RIGHT]
                        + ", " + dirStrings[FORWARD] + " " + angles[FORWARD]
-                       + "\n" + dirStrings[visibleSide] + " is visible ";
+                       + "\n" + dirStrings[visibleSide] + " is facing you";
                        ;
                 measurements++;
             }

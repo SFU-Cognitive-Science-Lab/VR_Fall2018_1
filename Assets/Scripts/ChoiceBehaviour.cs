@@ -12,7 +12,7 @@
  *  Insert choices as appropriate in the following List
  *  Apply materials to the material slots
  *  
- * firstChoice is used to denote whether the plyer choice this game object
+ * firstChoice is used to denote whether the player chose this game object
  * If this is the player's first choice, colors will change, otherwise colors will stay the same.
  * 
  * Additional scripts Used: [CustomTag]
@@ -69,8 +69,14 @@ public class ChoiceBehaviour : MonoBehaviour {
                     GameObject[] currentObjs = GameObject.FindGameObjectsWithTag("Interactable Object");
                     foreach (GameObject cube in currentObjs)
                     {
-                        if (cube.GetComponent<CustomTag>().getTag(0) == cTag)
+                        string chosenTag = cube.GetComponent<CustomTag>().getTag(0);
+                        if (chosenTag == cTag)
                         {
+                            // TODO: find out the correct place to put this (Cal)
+                            // Also TODO: find out what trial number we are on (Cal)
+                            // this is causing us to save groups of these rather than just one
+                            DataFarmer.GetInstance().Save(new DFAnswerSelection(Time.time, cube.name, cTag, cTag, Vector3.zero));
+
                             //Correct Choice == change this to green, others to grey, next to blue
                             this.GetComponent<Renderer>().material = correctMat;
 
@@ -78,7 +84,7 @@ public class ChoiceBehaviour : MonoBehaviour {
                             {
                                 if (choices[i] != gameObject)
                                 {
-                                    if (choices[i].GetComponent<CustomTag>().getTag(0) != "NEXT") //Set all other buttons to graey.
+                                    if (choices[i].GetComponent<CustomTag>().getTag(0) != "NEXT") //Set all other buttons to grey.
                                     {
                                         choices[i].GetComponent<Renderer>().material = neutralMat;
                                         choices[i].GetComponent<ChoiceBehaviour>().setFirstChoice(false);
@@ -93,6 +99,11 @@ public class ChoiceBehaviour : MonoBehaviour {
                         }
                         else
                         {
+                            // TODO: find out the correct place to put this (Cal)
+                            // Also TODO: find out what trial number we are on (Cal)
+                            // this is causing us to log groups of these rather than just one
+                            DataFarmer.GetInstance().Save(new DFAnswerSelection(Time.time, cube.name, cTag, chosenTag, Vector3.zero));
+
                             //Incorrect choice == change this to red, correct to green, others to grey, next to blue
                             this.GetComponent<Renderer>().material = wrongMat;
                             for (int i = 0; i < choices.Count; i++)

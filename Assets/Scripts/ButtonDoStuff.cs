@@ -12,19 +12,19 @@ public class ButtonDoStuff : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		
-	}
+        // Cal: we should definitely complain and abort if the id doesn't show up
+        // as that would mean we lost our connection to mary
+        participantID.text = DataFarmer.GetInstance().GetParticipantAsString();
+    }
 	
 	// Update is called once per frame
 	void Update () {
-		
 	}
 
     public void action()
     {
-        participantID.text = DataFarmer.GetInstance().getParticipantAsString();
-
         camVR.GetComponent<CustomTag>().setTag(0, participantID.text);
+        DataFarmer.GetInstance().SetParticipant(participantID.text);
         menu.SetActive(false);
     }
 

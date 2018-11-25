@@ -20,7 +20,7 @@ public class DataFarmer {
     private static int BUFFER_FULL = 10;
     private static int SAVE_RETRIES = 5;
 
-    // Establish Webclient
+    // Webclient needed to save data externally
     private WebClient webClient;
 
     // Declare authorization code
@@ -29,6 +29,7 @@ public class DataFarmer {
     // Declare Participant Subject ID
     private long participant = -1;
 
+    // must be true if we are to save data externally
     private bool loggedin = false;
 
     // for GetConfig below
@@ -210,7 +211,7 @@ public class DataFarmer {
 
     // Saving the Data Chunk to File and remotely
     // on error does a lot of complaining and will throw an exception if no data can be saved
-    public void Save (IDataFarmerObject thingToSave) {
+    public void Save (DataFarmerObject thingToSave) {
         
         // Since this section is called every frame, the data.add line will continue to receive a new line of data on every iteration until the BUFFER is reached
         data.Add(thingToSave);
