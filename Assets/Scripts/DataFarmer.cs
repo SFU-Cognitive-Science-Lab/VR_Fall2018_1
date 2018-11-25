@@ -79,16 +79,16 @@ public class DataFarmer {
                     continue;
                 }
                 string name = lineMatch.Groups["name"].ToString().ToLower();
-                string value = lineMatch.Groups["value"].ToString().Replace(System.Environment.NewLine,"");
-                Debug.Log(string.Format("set {0} to {1}\n", name, value));
+                string value = Regex.Replace(lineMatch.Groups["value"].ToString(), @"\r\n?|\n", "");
                 switch (name)
                 {
                     case "url": case "uri": REMOTE_URI = value; break;
                     case "secret": case "password": REMOTE_SECRET = value; break;
                     case "log": LOCAL_LOG = value; break;
                     case "buffer": BUFFER_FULL = int.Parse(value); break;
-                    default: Debug.Log(string.Format("don't know what {0} is", name)); break;
+                    default: Debug.Log(string.Format("don't know what {0} is", name)); continue;
                 }
+                Debug.Log(string.Format("set '{0}' to '{1}'.\n", name, value));
             }
         }
     }
@@ -228,11 +228,18 @@ public class DataFarmer {
             // update csv log on file path
             if (LOCAL_LOG != null)
             {
-                Debug.Log("Data Moving to File!");
-                using (StreamWriter file = File.AppendText(LOCAL_LOG))
+                try
                 {
-                    file.Write(dataString);
-                    anythingsaved = true;
+                    Debug.Log("Data Moving to File!");
+                    using (StreamWriter file = File.AppendText(LOCAL_LOG))
+                    {
+                        file.Write(dataString);
+                        anythingsaved = true;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Debug.Log(string.Format("failed to write to log: {0} {1}", e, e.Message));
                 }
             }
 
@@ -268,7 +275,7 @@ public class DataFarmer {
                     string uri = string.Format("{0}/save/{1}", REMOTE_URI, participant);
                     string result = PostRequest(uri, dataString);
                     Debug.Log("save result: " + result);
-                    if (result.Contains("saved"))
+                    if (result.StartsWith("OK"))
                     {
                         Debug.Log("confirmed save");
                         saved = true;
@@ -276,11 +283,12 @@ public class DataFarmer {
                     else
                     {
                         tries--;
+                        if (tries <= 0) break;
                         Debug.Log("failed trying to log in again " + tries + " tries left");
                         Thread.Sleep(SAVE_RETRIES - tries * 500); // ms to wait before trying again
                         Login();
                     }
-                } while (loggedin && saved && tries > 0);
+                } while (loggedin && !saved);
                 if (!saved)
                 {
                     Debug.Log("ERROR: NOT ABLE TO SAVE DATA REMOTELY!");
