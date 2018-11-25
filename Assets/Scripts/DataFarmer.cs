@@ -1,7 +1,11 @@
-﻿using System;
+﻿ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading;
 using UnityEngine;
 
 public class DataFarmer {
@@ -14,6 +18,7 @@ public class DataFarmer {
 
     // SET BUFFER THRESHHOLD WHICH, WHEN MET, WILL STREAM DATA CHUNKS OUTWARD
     private static int BUFFER_FULL = 10;
+    private static int SAVE_RETRIES = 5;
 
     // Establish Webclient
     private WebClient webClient;
@@ -24,15 +29,16 @@ public class DataFarmer {
     // Declare Participant Subject ID
     private long participant = -1;
 
+    private bool loggedin = false;
 
-    // TODO: put this stuff in a config file
-    // This is a webservice that is now running - i.e. we can save data remotely
-    private static string REMOTE_URI = "https://cslab.psyc.sfu.ca:13524";
-    private static string REMOTE_SECRET = "doorcode";
-
+    // for GetConfig below
+    private static string CONFIG_FILE;
+    private static string REMOTE_URI;
+    private static string REMOTE_SECRET;
+    private static string LOCAL_LOG;
 
     // Use this for initialization - Creates a "virtual" game object.
-	public static DataFarmer GetInstance () {
+    public static DataFarmer GetInstance () {
 		if (me == null)
         {
             me = new DataFarmer();
@@ -42,29 +48,105 @@ public class DataFarmer {
 
 	private DataFarmer()
     {
-        using (webClient = getNewWebClient())
+        GetConfig();
+        if (Login())
         {
-            
-            
-            // example of getting a participant id automatically
-            // TODO: grab a human entered participant id
-            // you can just log in with /login/<key> rather than /new/<key>
-            // if you are already logged in use /new to get a new part id
-            // the auth cookie must be added for the /new syntax to work
-            string content = webClient.DownloadString(string.Format("{0}/new/{1}", REMOTE_URI, REMOTE_SECRET));
-            try
+            NewParticipant();
+        }
+    }
+
+    // use saved configuration data to 
+    private static void GetConfig()
+    {
+        if (CONFIG_FILE == null)
+        {
+            string desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            CONFIG_FILE = string.Format(@"{0}\{1}", desktop, "experiments.config.txt");
+        }
+        Regex linePat = new Regex(@"(?<name>\w+)[=:\s](?<value>.*)");
+        using (StreamReader conf = File.OpenText(CONFIG_FILE))
+        {
+            while (!conf.EndOfStream)
             {
-                long.TryParse(content, out participant);
-                Debug.Log(string.Format("participant {0}", participant));
+                string line = conf.ReadLine();
+                if (line.StartsWith("#") || line.StartsWith("//"))
+                {
+                    continue;
+                }
+                Match lineMatch = linePat.Match(line);
+                if (!lineMatch.Success)
+                {
+                    continue;
+                }
+                string name = lineMatch.Groups["name"].ToString().ToLower();
+                string value = lineMatch.Groups["value"].ToString().Replace(System.Environment.NewLine,"");
+                Debug.Log(string.Format("set {0} to {1}\n", name, value));
+                switch (name)
+                {
+                    case "url": case "uri": REMOTE_URI = value; break;
+                    case "secret": case "password": REMOTE_SECRET = value; break;
+                    case "log": LOCAL_LOG = value; break;
+                    case "buffer": BUFFER_FULL = int.Parse(value); break;
+                    default: Debug.Log(string.Format("don't know what {0} is", name)); break;
+                }
             }
-            catch (Exception e)
+        }
+    }
+
+    // use this method to reset the configuration file before 
+    public static void SetConfigFile(string fname)
+    {
+        CONFIG_FILE = fname;
+        Debug.Log("reset config file to " + CONFIG_FILE);
+        if (File.Exists(CONFIG_FILE))
+        {
+            Debug.Log("updating configuration");
+            GetConfig();
+        }
+    }
+
+    // use this method when setting the participant id by hand
+    public void SetParticipant(string part)
+    {
+        Debug.Log("trying to set participant id to " + part);
+        try
+        {
+            long.TryParse(part, out participant);
+            Debug.Log("participant id now " + participant);
+        }
+        catch (Exception e)
+        {
+            participant = -1;
+            Debug.Log(string.Format("error setting participant {0}: {1}: {2}", part, e, e.Message));
+        }
+    }
+
+    public string GetParticipantAsString()
+    {
+        return participant.ToString();
+    }
+
+    public long GetParticipant()
+    {
+        return participant;
+    }
+
+    // logs in and as a side effect gets our auth cookie - needed for all other requests
+    private bool Login()
+    {
+        loggedin = false;
+        if (REMOTE_URI == null || REMOTE_SECRET == null)
+        {
+            throw new Exception("DataFarmer missing configuation needed to log in!");
+        }
+        using (webClient = GetNewWebClient())
+        {
+            string content = webClient.DownloadString(makeNonce().Uri(string.Format("{0}/login", REMOTE_URI)));
+            Debug.Log("login result: " + content);
+            if (content.Contains("OK"))
             {
-                Debug.Log(e.Message);
+                loggedin = true;
             }
-            
-            
-            
-            // TODO: there is probably an easier way to do this - I'm not sure what this seciton is aiming to do.
             WebHeaderCollection headers = webClient.ResponseHeaders;
             int i = 0;
             for (; i < headers.Count; i++)
@@ -77,31 +159,65 @@ public class DataFarmer {
                     break;
                 }
             }
-            // end web connection?
             webClient.Dispose();
         }
-
+        return loggedin;
     }
 
-    public string getParticipantAsString()
+    // tools for making basic requests - we must be logged in to use them
+    // Post uses the http POST method and expects extra data to send
+    private string PostRequest(string uri, string dataString)
     {
-        return participant.ToString();
+        string result = null;
+        using (webClient = GetNewWebClient())
+        {
+            // if this auth cookie is invalid nothing will work ...
+            webClient.Headers.Add("Content-Type", "text/plain");
+            webClient.Headers.Add("Cookie", auth);
+            result = webClient.UploadString(uri, "POST", dataString);
+        }
+        webClient.Dispose();
+        return result;
     }
 
-    public long getParticipant()
+    // Get uses http's GET method and only needs a url
+    private string GetRequest(string uri)
     {
-        return participant;
+        string result = null;
+        using (webClient = GetNewWebClient())
+        {
+            webClient.Headers.Add("Content-Type", "text/plain");
+            webClient.Headers.Add("Cookie", auth);
+            result = webClient.DownloadString(uri);
+        }
+        webClient.Dispose();
+        return result;
     }
 
-    // Saving the Data Chunk to File
-	public void Save (IDataFarmerObject thingToSave) {
+    // make a participant id if we don't have one already
+    private void NewParticipant()
+    {
+        string content = GetRequest(string.Format("{0}/new", REMOTE_URI));
+        try
+        {
+            long.TryParse(content, out participant);
+        }
+        catch (Exception e)
+        {
+            Debug.Log(string.Format("error getting new participant id: {0}: {1}", e, e.Message));
+        }
+    }
+
+    // Saving the Data Chunk to File and remotely
+    // on error does a lot of complaining and will throw an exception if no data can be saved
+    public void Save (IDataFarmerObject thingToSave) {
         
         // Since this section is called every frame, the data.add line will continue to receive a new line of data on every iteration until the BUFFER is reached
         data.Add(thingToSave);
-        
+
         if (data.Count == BUFFER_FULL)
         {
-
+            bool anythingsaved = false;
             // Serialize data structure
             string dataString = "";
             foreach (IDataFarmerObject o in data)
@@ -109,42 +225,130 @@ public class DataFarmer {
                 dataString += o.Serialize(participant);
             }
 
-            // Report in console that data has been moved, and then update csv on file path
-            Debug.Log("Data Moving to File!");
-            using (StreamWriter file =
-                   File.AppendText(@"C:\Users\CSLUser\Desktop\df.csv"))
+            // update csv log on file path
+            if (LOCAL_LOG != null)
             {
-                file.Write(dataString);
-            }
-            try
-            {
-                // TODO: don't just keep failing if the cookie is no longer valid
-                // TODO: put all this webclient code in another class/method
-                // TODO: look at more sophisticated ways to to the requests e.g. https://social.msdn.microsoft.com/Forums/vstudio/en-US/33798503-2896-4850-aa4b-11022c2b3adf/how-can-i-send-webrequest-with-multiple-cookies?forum=csharpgeneral
-                if (participant > 0)
+                Debug.Log("Data Moving to File!");
+                using (StreamWriter file = File.AppendText(LOCAL_LOG))
                 {
-                    using (webClient = getNewWebClient())
-                    {
-                        webClient.Headers.Add("Content-Type", "text/plain");
-                        webClient.Headers.Add("Cookie", auth);
-                        string uri = string.Format("{0}/save/{1}", REMOTE_URI, participant);
-                        string result = webClient.UploadString(uri, "POST", dataString);
-                        Debug.Log("save result: " + result);
-                    }
-                    webClient.Dispose();
+                    file.Write(dataString);
+                    anythingsaved = true;
                 }
-            } 
-            catch (Exception e)
-            {
-                Debug.Log(e.Message);
             }
+
+            if (SaveRemotely(dataString))
+            {
+                anythingsaved = true;
+            }
+
             data.Clear();
+            if (!anythingsaved)
+            {
+                Debug.Log("ERROR: NO DATA COULD BE SAVED!");
+                throw new Exception("no data can be saved");
+            }
         }
 	}
-    private WebClient getNewWebClient()
+
+    // send remote data if we can
+    private bool SaveRemotely(string dataString)
+    {
+        bool saved = false;
+        try
+        {
+            if (!loggedin) Login();
+
+            if (loggedin && participant >= 0)
+            {
+                // check if we succeeded and retry a limited number of times with backoff if we don't
+                int tries = SAVE_RETRIES;
+                do
+                {
+                    saved = false;
+                    string uri = string.Format("{0}/save/{1}", REMOTE_URI, participant);
+                    string result = PostRequest(uri, dataString);
+                    Debug.Log("save result: " + result);
+                    if (result.Contains("saved"))
+                    {
+                        Debug.Log("confirmed save");
+                        saved = true;
+                    }
+                    else
+                    {
+                        tries--;
+                        Debug.Log("failed trying to log in again " + tries + " tries left");
+                        Thread.Sleep(SAVE_RETRIES - tries * 500); // ms to wait before trying again
+                        Login();
+                    }
+                } while (loggedin && saved && tries > 0);
+                if (!saved)
+                {
+                    Debug.Log("ERROR: NOT ABLE TO SAVE DATA REMOTELY!");
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.Log(e.Message);
+        }
+        return saved;
+    }
+    // gets a very tolerant web client 
+    private WebClient GetNewWebClient()
     {
         // this line is needed for https to work with our self-signed certificates
         ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
         return new WebClient();
+    }
+
+    // how to hide sending the actual password over the network
+    private Nonce makeNonce()
+    {
+        return new Nonce(REMOTE_SECRET);
+    }
+
+    // does some fancy stuff to use a random number to obscure our password
+    // this class is effectively final: there is no way to change the code/nonce after instantiation
+    private class Nonce
+    {
+        private int nonce;
+        private string code;
+
+        public Nonce(string secret)
+        {
+            System.Random random = new System.Random();
+            nonce = random.Next(int.MaxValue);
+            code = Encode(secret);
+        }
+
+        // another architecture would be to have MakeCode be a callback
+        private string Encode(string secret)
+        { 
+            using (SHA256 sha256Hash = SHA256.Create())
+            {
+                // ComputeHash - returns byte array  
+                byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(MakeCode(secret)));
+
+                // Convert byte array to a string   
+                StringBuilder builder = new StringBuilder();
+                for (int i = 0; i < bytes.Length; i++)
+                {
+                    builder.Append(bytes[i].ToString("x2"));
+                }
+                code = builder.ToString();
+            }
+            return code;
+        }
+
+        // this can be made more complex but has to also be replicated on the remote server
+        private string MakeCode(string secret)
+        {
+            return string.Format("{0}{1}", nonce, secret);
+        }
+
+        public string Uri(string baseUri)
+        {
+            return string.Format("{0}/{1}/{2}", baseUri, code, nonce);
+        }
     }
 }
