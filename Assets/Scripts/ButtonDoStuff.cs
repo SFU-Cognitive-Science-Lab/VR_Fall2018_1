@@ -12,7 +12,7 @@ public class ButtonDoStuff : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        // Cal: we should definitely complain and abort if the id doesn't show up
+        // TODO Cal: we should definitely complain and abort if the id doesn't show up
         // as that would mean we lost our connection to mary
         participantID.text = DataFarmer.GetInstance().GetParticipantAsString();
     }
@@ -24,7 +24,13 @@ public class ButtonDoStuff : MonoBehaviour {
     public void action()
     {
         camVR.GetComponent<CustomTag>().setTag(0, participantID.text);
-        DataFarmer.GetInstance().SetParticipant(participantID.text);
+        
+        // Cal: this was being set in the Cubes.createSet() method but we may want to
+        // simply enter this at the start of experiment rather than depend on the 
+        // participant id - which could get out of sync if we have multiple false starts
+        applicator.Condition = 
+            DataFarmer.GetInstance().SetParticipant(participantID.text).ConditionFromParticipant();
+
         menu.SetActive(false);
     }
 

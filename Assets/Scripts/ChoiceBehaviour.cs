@@ -19,7 +19,6 @@
  */
 
 
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -35,8 +34,6 @@ public class ChoiceBehaviour : MonoBehaviour {
     public Valve.VR.InteractionSystem.Hand fallbackController;
     public Valve.VR.InteractionSystem.Hand leftController;
     public Valve.VR.InteractionSystem.Hand rightController;
-
-    
 
     void Start () {
         firstChoice = true;
@@ -65,21 +62,18 @@ public class ChoiceBehaviour : MonoBehaviour {
                 if (firstChoice == true)
                 {
                     this.GetComponent<CustomTag>().buttonTagBehaviour(cTag); // Call custom tag top set correct/incorrect
-
+                    
                     GameObject[] currentObjs = GameObject.FindGameObjectsWithTag("Interactable Object");
                     foreach (GameObject cube in currentObjs)
                     {
                         string chosenTag = cube.GetComponent<CustomTag>().getTag(0);
+                        DataFarmer.GetInstance().SetChoice(chosenTag);
+
                         if (chosenTag == cTag)
                         {
-                            // TODO: find out the correct place to put this (Cal)
-                            // Also TODO: find out what trial number we are on (Cal)
-                            // this is causing us to save groups of these rather than just one
-                            DataFarmer.GetInstance().Save(new DFAnswerSelection(Time.time, cube.name, cTag, cTag, Vector3.zero));
-
                             //Correct Choice == change this to green, others to grey, next to blue
                             this.GetComponent<Renderer>().material = correctMat;
-
+                            
                             for (int i = 0; i < choices.Count; i++)
                             {
                                 if (choices[i] != gameObject)
@@ -99,11 +93,6 @@ public class ChoiceBehaviour : MonoBehaviour {
                         }
                         else
                         {
-                            // TODO: find out the correct place to put this (Cal)
-                            // Also TODO: find out what trial number we are on (Cal)
-                            // this is causing us to log groups of these rather than just one
-                            DataFarmer.GetInstance().Save(new DFAnswerSelection(Time.time, cube.name, cTag, chosenTag, Vector3.zero));
-
                             //Incorrect choice == change this to red, correct to green, others to grey, next to blue
                             this.GetComponent<Renderer>().material = wrongMat;
                             for (int i = 0; i < choices.Count; i++)
@@ -174,8 +163,6 @@ public class ChoiceBehaviour : MonoBehaviour {
         this.GetComponent<SpawnRandomBox>().spawn();
         
     }
-
-
 
     public void Activate()
     {

@@ -8,7 +8,7 @@ public class FindClosestSide : MonoBehaviour {
     int RIGHT = 0, UP = 1, FORWARD = 2, NOSIDE = 3;
     string[] dirStrings = { "right", "up", "forward", "no side" };
     int previousSide;
-    public int thresholdAngle = 62;
+    public int thresholdAngle = 56;
     public bool detailedLogging = false;
     public Text angleDisplay;
 
@@ -27,6 +27,9 @@ public class FindClosestSide : MonoBehaviour {
         if (player != null)
         {
             GameObject cube = GameObject.FindGameObjectWithTag("Interactable Object");
+            Renderer rend;
+            rend = cube.GetComponent<Renderer>();
+           
             if (cube != null)
             {
                 Transform transform = cube.GetComponent<Transform>();
@@ -53,12 +56,18 @@ public class FindClosestSide : MonoBehaviour {
                 if (visibleSide != previousSide)
                 {
                     // the last Vector3 is a placeholder for the cumulative movement of the head and hand controllers
-                    DataFarmer.GetInstance().Save(new DFFixation(Time.time, cube.name, dirStrings[visibleSide], CasterofRays.ObjUnderReticle, Vector3.zero));
+                    DataFarmer.GetInstance().Save(
+                        new DFFixation(
+                            angles[1], angles[2], angles[0], 
+                            dirStrings[visibleSide], 
+                            CasterofRays.ObjUnderReticle
+                        )
+                    );
                     previousSide = visibleSide;
                 }
                 
                 if (detailedLogging && measurements % 20 == 0) angleDisplay.text = 
-                       "right " + player.transform.forward[RIGHT] 
+                       "right " + player.transform.forward[RIGHT]
                        + " up " + player.transform.forward[UP]
                        + "\n" + dirStrings[UP] + " " + angles[UP]
                        + ", " + dirStrings[RIGHT] + " " + angles[RIGHT]

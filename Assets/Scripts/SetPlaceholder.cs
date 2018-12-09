@@ -7,7 +7,7 @@ public class SetPlaceholder : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        gameObject.GetComponent<InputField>().text = DataFarmer.GetInstance().getParticipantAsString();
+        gameObject.GetComponent<InputField>().text = DataFarmer.GetInstance().GetParticipantAsString();
     }
 	
 }

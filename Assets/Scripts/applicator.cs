@@ -7,14 +7,20 @@ using UnityEngine;
 public class applicator : MonoBehaviour {
     public Material[] material;
     Renderer rend;
-    
+    // Cal: how many counterbalancing conditions we support
+    // TODO: integrate this with an external list of conditions
+    public static readonly long ConditionCount = 36;
+    public static long Condition = -1;
+
     void Start()
     {
         Cubes cubes = new Cubes();
 
         rend = GetComponent<Renderer>();
         rend.enabled = true;
-        rend.materials = createSet(int.Parse(GameObject.FindGameObjectsWithTag("MainCamera")[0].GetComponent<CustomTag>().getTag(0)), name.Replace("(Clone)", ""));
+        // Cal: instead of using a game object for this use DataFarmer
+        // rend.materials = createSet(int.Parse(GameObject.FindGameObjectsWithTag("MainCamera")[0].GetComponent<CustomTag>().getTag(0)), name.Replace("(Clone)", ""));
+        rend.materials = createSet(name.Replace("(Clone)", ""));
         Debug.Log("ID: " + int.Parse(GameObject.FindGameObjectsWithTag("MainCamera")[0].GetComponent<CustomTag>().getTag(0)));
     }
 
@@ -38,7 +44,8 @@ public class applicator : MonoBehaviour {
     [6] = Blue Upward Triangle
     */
 
-    Material[] createSet(int subject, string cube)
+    // Material[] createSet(int subject, string cube)
+    Material[] createSet(string cube)
     {
         Material[] matlist = rend.materials;
         /*
@@ -69,9 +76,8 @@ public class applicator : MonoBehaviour {
         are I1, P1-6 and so on. The combination is selected based on the subject number.
         */
 
-        // Cal: I have grave misgivings about depending on this
-        // could we set it explicitly? or at least be able to change it?
-        int select = subject % 36; 
+        // Cal: setting this explicitly at the start of the experiment
+        // int select = subject % 36; 
 
         //initialize vars representing features and placements
         int F1x = 1;
@@ -90,7 +96,7 @@ public class applicator : MonoBehaviour {
 
         int c = 0;
         //This loop decides which set will belong to each feature
-        for (int i = 1; i <= select; i++)
+        for (int i = 1; i <= Condition; i++)
         {
             
             //for every 6th increment, shift feature sets
@@ -112,7 +118,7 @@ public class applicator : MonoBehaviour {
         }
         
         //This loop decides where each feature will go on the cube
-        for (int i = 1; i <= select; i++)
+        for (int i = 1; i <= Condition; i++)
         {
             //for every increment, swap positions of features in matlist
             //alternate swaps to ensure all permutations

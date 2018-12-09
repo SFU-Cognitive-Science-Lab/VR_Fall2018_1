@@ -1,26 +1,25 @@
 ﻿using UnityEngine;
 
 public class DFFixation : DataFarmerObject {
-    private string cube;
     private string side;
+    private int up;
+    private int forward;
+    private int right;
     private string pointingAt;
-    // this is just the head, left and right controller cumulative movement
-    Vector3 movement;
 
-	public DFFixation(float timestamp, string cube, string side, string pointingAt, Vector3 mv): 
-        base("fixation", timestamp)
+	public DFFixation(int up, int forward, int right, string side, string pointingAt): 
+        base("fixation")
     {
-        this.cube = cube;
         this.side = side;
         this.pointingAt = pointingAt;
-        this.movement = mv;
+        this.up = up;
+        this.forward = forward;
+        this.right = right;
     }
 
-    public override string Serialize(long participant)
+    public override string Serialize()
     {
-        return string.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8}\n", 
-                tag, participant, timestamp, 
-                cube, side, pointingAt, 
-                movement.x, movement.y, movement.z);
+        return string.Format("{0},{1},{2},{3},{4},{5}\n",
+                base.Serialize(), up, forward, right, side, pointingAt);
     }
 }

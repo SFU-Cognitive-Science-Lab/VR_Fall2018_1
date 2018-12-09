@@ -14,7 +14,10 @@ public class Cubes {
     [5] = Blue Downward Triangle
     [6] = Blue Upward Triangle
     */
-    
+
+    public static readonly long ConditionCount = 36;
+    public static int CurrentCondition = -1;
+
     public void swap(int [] array, int pos1, int pos2)
     {
         int temp = array[pos1];
@@ -23,7 +26,7 @@ public class Cubes {
         return;
     }
 
-    public Material[] createSet(int subject, string type, Renderer rend)
+    public Material[] createSet(string type, Renderer rend)
     {
 
         /*
@@ -56,8 +59,13 @@ public class Cubes {
         int [] FeatureSet = { 1, 2, 3 };
         // feature set values indicate feature set, indexes indicate feature number e.g. F1 = FS[0], FS[0] = 1 = red
         Material[] matlist = rend.materials;
-        int select = subject % 36;
-        
+
+        // Cal: removing this assignment as 
+        // as I think doing this explicitly when we start the experiment 
+        // is likely to be less error prone
+        // int select = subject % ConditionCount;
+
+
         int[] face = { 1, 2, 3, 4, 5, 6 };
         /*
             [0] = right
@@ -70,7 +78,7 @@ public class Cubes {
 
         int c = 0;
         //This loop decides which set will belong to each feature
-        for (int i = 1; i <= select; i++)
+        for (int i = 1; i <= CurrentCondition; i++)
         {
 
             //for every 6th increment, shift feature sets
@@ -92,7 +100,7 @@ public class Cubes {
         }
 
         //This loop decides where each feature will go on the cube
-        for (int i = 1; i <= select; i++)
+        for (int i = 1; i <= CurrentCondition; i++)
         {
             //for every increment, swap positions of features in matlist
             //alternate swaps to ensure all permutations

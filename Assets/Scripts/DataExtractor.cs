@@ -42,7 +42,7 @@ public class DataExtractor : MonoBehaviour
         if (framecount % 100 == 0)
         {
             distanceTravelled += Vector3.Distance(transform.position, previousPosition);
-            DataFarmer.GetInstance().Save(new DFPositionRotation(Time.time, transform.position, transform.rotation, distanceTravelled));
+            DataFarmer.GetInstance().Save(new DFPositionRotation(transform.position, transform.rotation, distanceTravelled));
             previousPosition = transform.position;
         }
 

@@ -27,7 +27,6 @@ GameObject:
   - component: {fileID: 65062460993151682}
   - component: {fileID: 114859151121280294}
   - component: {fileID: 114463769274002044}
-  - component: {fileID: 114627388347705394}
   m_Layer: 0
   m_Name: C2
   m_TagString: Interactable Object
@@ -170,18 +169,6 @@ MonoBehaviour:
   velocityAverageFrames: 5
   angularVelocityAverageFrames: 11
   estimateOnAwake: 0
---- !u!114 &114627388347705394
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1666049121138686}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 15e446afb344a0848bfe28786e582ded, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rightController: {fileID: 0}
 --- !u!114 &114859151121280294
 MonoBehaviour:
   m_ObjectHideFlags: 1

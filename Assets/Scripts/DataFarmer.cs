@@ -1,4 +1,4 @@
-﻿ using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -13,12 +13,30 @@ public class DataFarmer {
     // 
     private static DataFarmer me = null;
 
-    // 
+    // buffer for incoming data
     private List<IDataFarmerObject> data = new List<IDataFarmerObject>();
 
     // SET BUFFER THRESHHOLD WHICH, WHEN MET, WILL STREAM DATA CHUNKS OUTWARD
+    // this can be overridden from the config file
     private static int BUFFER_FULL = 10;
     private static int SAVE_RETRIES = 5;
+
+    // Cal: some state variables. TODO put this stuff in a separate class...
+
+    // trial == iteration of learning using a randomized cube
+    private long trial = 0;
+
+    // condition == which set of cubes -> categories was chosen
+    // this affects overall what the participant sees during the experiment
+    // we need to check this to ensure counterbalancing is correct
+    // we assume we know what this map is (maybe it doesn't matter?)
+    private int condition;
+
+    // which cube got invoked
+    private Transform cube;
+
+    // what they chose
+    private string choice;
 
     // Webclient needed to save data externally
     private WebClient webClient;
@@ -26,8 +44,12 @@ public class DataFarmer {
     // Declare authorization code
     private string auth;
 
-    // Declare Participant Subject ID
+    // We started with this state variable which we get externally
+    // Participant Subject ID initially garnered from the external host
+    // can be overridden from the UI at the moment
     private long participant = -1;
+
+    // Cal: end of state variables
 
     // must be true if we are to save data externally
     private bool loggedin = false;
@@ -47,6 +69,8 @@ public class DataFarmer {
         return me;
 	}
 
+    // this particular instantiation assumes we are logging to an 
+    // external server that is coordinating participant ids
 	private DataFarmer()
     {
         GetConfig();
@@ -95,7 +119,7 @@ public class DataFarmer {
     }
 
     // use this method to reset the configuration file before 
-    public static void SetConfigFile(string fname)
+    public DataFarmer SetConfigFile(string fname)
     {
         CONFIG_FILE = fname;
         Debug.Log("reset config file to " + CONFIG_FILE);
@@ -104,10 +128,11 @@ public class DataFarmer {
             Debug.Log("updating configuration");
             GetConfig();
         }
+        return this;
     }
 
     // use this method when setting the participant id by hand
-    public void SetParticipant(string part)
+    public DataFarmer SetParticipant(string part)
     {
         Debug.Log("trying to set participant id to " + part);
         try
@@ -120,6 +145,7 @@ public class DataFarmer {
             participant = -1;
             Debug.Log(string.Format("error setting participant {0}: {1}: {2}", part, e, e.Message));
         }
+        return this;
     }
 
     public string GetParticipantAsString()
@@ -130,6 +156,74 @@ public class DataFarmer {
     public long GetParticipant()
     {
         return participant;
+    }
+
+    // Cal: TODO this stuff could be put in a different class 
+    // idea with the set methods is that they can be stringed together
+    // DataFarmer.GetInstance().SetThing1(thing1).SetThing2(thing2)...
+    public DataFarmer SetTrial(long trial)
+    {
+        if (trial > 0) this.trial = trial;
+        return this;
+    }
+
+    public DataFarmer IncTrial()
+    {
+        this.trial++;
+        return this;
+    }
+
+    public long GetTrial()
+    {
+        return this.trial;
+    }
+
+    public DataFarmer SetCondition(int condition)
+    {
+        this.condition = condition;
+        return this;
+    }
+    
+    public int ConditionFromParticipant()
+    {
+        this.condition = (int)(participant % applicator.ConditionCount);
+        return this.condition;
+    }
+
+    public int GetCondition()
+    {
+        return this.condition;
+    }
+
+    public DataFarmer SetCube(Transform cube)
+    {
+        this.cube = cube;
+        return this;
+    }
+
+    public Transform GetCube()
+    {
+        return this.cube;
+    }
+
+    // See ChoiceBehavior.cs for examples of how this is used
+    public string GetCategory()
+    {
+        if (cube == null) return "";
+        return cube.GetComponent<CustomTag>().getTag(0).Substring(0,1);
+    }
+
+    // Because the ChoiceBehavior.cs script is getting invoked many times, 
+    // keep the choice multiple times but report it once
+    public DataFarmer SetChoice(string choice)
+    {
+        this.choice = choice;
+        return this;
+    }
+
+    public string GetChoice()
+    {
+        return this.choice;
     }
 
     // logs in and as a side effect gets our auth cookie - needed for all other requests
@@ -223,7 +317,7 @@ public class DataFarmer {
             string dataString = "";
             foreach (IDataFarmerObject o in data)
             {
-                dataString += o.Serialize(participant);
+                dataString += o.Serialize();
             }
 
             // update csv log on file path

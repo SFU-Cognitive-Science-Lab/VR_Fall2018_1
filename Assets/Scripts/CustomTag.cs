@@ -23,15 +23,6 @@ public class CustomTag : MonoBehaviour
         return tags[index];
     }
 
-    public bool hasTag(string tag)
-    {
-        return tags.Contains(tag);
-    }
-    public void setTag(int index, string value)
-    {
-        tags[index] = value;
-    }
-
 /*[Methods to set and check (correct) tags for GameObjects]
 * 
 * Author: Rollin Poe
@@ -53,7 +44,6 @@ public class CustomTag : MonoBehaviour
         */
 
         //Debug.Log("Tag is: " + tags[0] + " Choice was: " + button);
-
         if (tags[1] == "") // to prevent multiple guesses
         {
             if (tags[0] == button)
@@ -83,6 +73,15 @@ public class CustomTag : MonoBehaviour
             //Call the object's set correct method
             cube.GetComponent<CustomTag>().setCorrect(choice);
         }
+    }
+
+    public bool hasTag(string tag)
+    {
+        return tags.Contains(tag);
+    }
+    public void setTag(int index, string value)
+    {
+        tags[index] = value;
     }
 
 }

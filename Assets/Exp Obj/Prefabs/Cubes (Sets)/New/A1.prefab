@@ -27,8 +27,6 @@ GameObject:
   - component: {fileID: 65447930339965804}
   - component: {fileID: 114893554301057726}
   - component: {fileID: 114819607840755502}
-  - component: {fileID: 114139460211311920}
-  - component: {fileID: 114608347455568510}
   m_Layer: 0
   m_Name: A1
   m_TagString: Interactable Object
@@ -124,27 +122,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.03, y: 0.03, z: 0.03}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &114139460211311920
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1666049121138686}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d3bb93f5f642c37408c9f006b4aceb27, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  choices: []
-  correctMat: {fileID: 2100000, guid: 303f9ece7a4eec2408bdbdf5ec6e58ad, type: 2}
-  wrongMat: {fileID: 2100000, guid: 20c40c2d63b9c924dbe56fecb5c5ced4, type: 2}
-  neutralMat: {fileID: 2100000, guid: d2d7533b051ef07409739afba063aafe, type: 2}
-  nextMat: {fileID: 2100000, guid: 6f642464f0211c044b29a8a0f20fe967, type: 2}
-  noChoiceMat: {fileID: 2100000, guid: 1f48e45588972ec45b826e54a25727b6, type: 2}
-  firstChoice: 0
-  fallbackController: {fileID: 0}
-  leftController: {fileID: 0}
-  rightController: {fileID: 0}
 --- !u!114 &114436500786624784
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -164,18 +141,6 @@ MonoBehaviour:
   - {fileID: 2100000, guid: c421f528bbc6e774b8097a40c3d5d42a, type: 2}
   - {fileID: 2100000, guid: d18ae82ab86b57343b706665b6bbecf5, type: 2}
   - {fileID: 2100000, guid: 6db0c1627648b6140931a8bc97b18154, type: 2}
---- !u!114 &114608347455568510
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1666049121138686}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 15e446afb344a0848bfe28786e582ded, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rightController: {fileID: 0}
 --- !u!114 &114819607840755502
 MonoBehaviour:
   m_ObjectHideFlags: 1
