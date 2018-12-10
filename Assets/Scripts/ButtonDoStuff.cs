@@ -14,7 +14,7 @@ public class ButtonDoStuff : MonoBehaviour {
 	void Start () {
         // TODO Cal: we should definitely complain and abort if the id doesn't show up
         // as that would mean we lost our connection to mary
-        participantID.text = DataFarmer.GetInstance().GetParticipantAsString();
+        participantID.text = ParticipantStatus.GetInstance().GetParticipantAsString();
     }
 	
 	// Update is called once per frame
@@ -29,7 +29,7 @@ public class ButtonDoStuff : MonoBehaviour {
         // simply enter this at the start of experiment rather than depend on the 
         // participant id - which could get out of sync if we have multiple false starts
         applicator.Condition = 
-            DataFarmer.GetInstance().SetParticipant(participantID.text).ConditionFromParticipant();
+            ParticipantStatus.GetInstance().SetParticipant(participantID.text).ConditionFromParticipant();
 
         menu.SetActive(false);
     }

@@ -21,44 +21,22 @@ public class DataFarmer {
     private static int BUFFER_FULL = 10;
     private static int SAVE_RETRIES = 5;
 
-    // Cal: some state variables. TODO put this stuff in a separate class...
-
-    // trial == iteration of learning using a randomized cube
-    private long trial = 0;
-
-    // condition == which set of cubes -> categories was chosen
-    // this affects overall what the participant sees during the experiment
-    // we need to check this to ensure counterbalancing is correct
-    // we assume we know what this map is (maybe it doesn't matter?)
-    private int condition;
-
-    // which cube got invoked
-    private Transform cube;
-
-    // what they chose
-    private string choice;
-
     // Webclient needed to save data externally
     private WebClient webClient;
 
-    // Declare authorization code
+    // authorization code needed to talk to web client
     private string auth;
-
-    // We started with this state variable which we get externally
-    // Participant Subject ID initially garnered from the external host
-    // can be overridden from the UI at the moment
-    private long participant = -1;
-
-    // Cal: end of state variables
 
     // must be true if we are to save data externally
     private bool loggedin = false;
+    public static readonly string NOT_LOGGED_IN = "ERROR: not logged in";
 
     // for GetConfig below
     private static string CONFIG_FILE;
     private static string REMOTE_URI;
     private static string REMOTE_SECRET;
-    private static string LOCAL_LOG;
+    private static readonly string DEFAULT_LOG = "df.csv";
+    private static string LOCAL_LOG = DefaultLog();
 
     // Use this for initialization - Creates a "virtual" game object.
     public static DataFarmer GetInstance () {
@@ -71,23 +49,39 @@ public class DataFarmer {
 
     // this particular instantiation assumes we are logging to an 
     // external server that is coordinating participant ids
-	private DataFarmer()
+    private DataFarmer()
     {
-        GetConfig();
-        if (Login())
-        {
-            NewParticipant();
-        }
+        Setup();
     }
 
-    // use saved configuration data to 
+    // logs in to external server and creates our identity for this run ...
+	public void Setup()
+    {
+        GetConfig();
+        Login();
+    }
+
+    private static string GetDesktop()
+    {
+        return Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+    }
+
+    private static string DefaultLog()
+    {
+        return string.Format(@"{0}\{1}", GetDesktop(), DEFAULT_LOG);
+    }
+
+    // use saved configuration data to set up external connection
+    // data buffering and other things
     private static void GetConfig()
     {
         if (CONFIG_FILE == null)
         {
-            string desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-            CONFIG_FILE = string.Format(@"{0}\{1}", desktop, "experiments.config.txt");
+            CONFIG_FILE = string.Format(@"{0}\{1}", GetDesktop(), "experiments.config.txt");
         }
+
+        if (!File.Exists(CONFIG_FILE)) return;
+
         Regex linePat = new Regex(@"(?<name>\w+)[=:\s](?<value>.*)");
         using (StreamReader conf = File.OpenText(CONFIG_FILE))
         {
@@ -131,100 +125,6 @@ public class DataFarmer {
         return this;
     }
 
-    // use this method when setting the participant id by hand
-    public DataFarmer SetParticipant(string part)
-    {
-        Debug.Log("trying to set participant id to " + part);
-        try
-        {
-            long.TryParse(part, out participant);
-            Debug.Log("participant id now " + participant);
-        }
-        catch (Exception e)
-        {
-            participant = -1;
-            Debug.Log(string.Format("error setting participant {0}: {1}: {2}", part, e, e.Message));
-        }
-        return this;
-    }
-
-    public string GetParticipantAsString()
-    {
-        return participant.ToString();
-    }
-
-    public long GetParticipant()
-    {
-        return participant;
-    }
-
-    // Cal: TODO this stuff could be put in a different class 
-    // idea with the set methods is that they can be stringed together
-    // DataFarmer.GetInstance().SetThing1(thing1).SetThing2(thing2)...
-    public DataFarmer SetTrial(long trial)
-    {
-        if (trial > 0) this.trial = trial;
-        return this;
-    }
-
-    public DataFarmer IncTrial()
-    {
-        this.trial++;
-        return this;
-    }
-
-    public long GetTrial()
-    {
-        return this.trial;
-    }
-
-    public DataFarmer SetCondition(int condition)
-    {
-        this.condition = condition;
-        return this;
-    }
-    
-    public int ConditionFromParticipant()
-    {
-        this.condition = (int)(participant % applicator.ConditionCount);
-        return this.condition;
-    }
-
-    public int GetCondition()
-    {
-        return this.condition;
-    }
-
-    public DataFarmer SetCube(Transform cube)
-    {
-        this.cube = cube;
-        return this;
-    }
-
-    public Transform GetCube()
-    {
-        return this.cube;
-    }
-
-    // See ChoiceBehavior.cs for examples of how this is used
-    public string GetCategory()
-    {
-        if (cube == null) return "";
-        return cube.GetComponent<CustomTag>().getTag(0).Substring(0,1);
-    }
-
-    // Because the ChoiceBehavior.cs script is getting invoked many times, 
-    // keep the choice multiple times but report it once
-    public DataFarmer SetChoice(string choice)
-    {
-        this.choice = choice;
-        return this;
-    }
-
-    public string GetChoice()
-    {
-        return this.choice;
-    }
 
     // logs in and as a side effect gets our auth cookie - needed for all other requests
     private bool Login()
@@ -232,7 +132,8 @@ public class DataFarmer {
         loggedin = false;
         if (REMOTE_URI == null || REMOTE_SECRET == null)
         {
-            throw new Exception("DataFarmer missing configuation needed to log in!");
+            Debug.Log("DataFarmer missing configuation needed to log in!");
+            return false;
         }
         using (webClient = GetNewWebClient())
         {
@@ -290,17 +191,11 @@ public class DataFarmer {
     }
 
     // make a participant id if we don't have one already
-    private void NewParticipant()
+    public string NewParticipant()
     {
-        string content = GetRequest(string.Format("{0}/new", REMOTE_URI));
-        try
-        {
-            long.TryParse(content, out participant);
-        }
-        catch (Exception e)
-        {
-            Debug.Log(string.Format("error getting new participant id: {0}: {1}", e, e.Message));
-        }
+        if (loggedin) 
+            return GetRequest(string.Format("{0}/new", REMOTE_URI));
+        return NOT_LOGGED_IN;
     }
 
     // Saving the Data Chunk to File and remotely
@@ -359,6 +254,8 @@ public class DataFarmer {
         try
         {
             if (!loggedin) Login();
+
+            long participant = ParticipantStatus.GetInstance().GetParticipant();
 
             if (loggedin && participant >= 0)
             {

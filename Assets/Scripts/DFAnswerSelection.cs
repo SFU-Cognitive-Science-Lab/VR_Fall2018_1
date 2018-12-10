@@ -5,10 +5,9 @@ public class DFAnswerSelection: DataFarmerObject
 {
     private string chosenAnswer;
 
-	public DFAnswerSelection():
-                base("answer")
+	public DFAnswerSelection(): base("answer")
     {
-        this.chosenAnswer = DataFarmer.GetInstance().GetChoice();
+        this.chosenAnswer = ParticipantStatus.GetInstance().GetChoice();
 	}
 
     public override string Serialize()

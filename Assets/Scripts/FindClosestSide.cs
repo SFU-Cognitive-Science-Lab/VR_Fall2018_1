@@ -24,9 +24,10 @@ public class FindClosestSide : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        if (player != null)
+        GameObject cube = GameObject.FindGameObjectWithTag("Interactable Object");
+
+        if (player != null && cube != null)
         {
-            GameObject cube = GameObject.FindGameObjectWithTag("Interactable Object");
             Renderer rend;
             rend = cube.GetComponent<Renderer>();
            
@@ -58,9 +59,10 @@ public class FindClosestSide : MonoBehaviour {
                     // the last Vector3 is a placeholder for the cumulative movement of the head and hand controllers
                     DataFarmer.GetInstance().Save(
                         new DFFixation(
-                            angles[1], angles[2], angles[0], 
-                            dirStrings[visibleSide], 
-                            CasterofRays.ObjUnderReticle
+                            angles[1], angles[2], angles[0],
+                            dirStrings[visibleSide],
+                            CasterofRays.MostCommonObject(),
+                            ParticipantStatus.GetInstance().DisplacementsToString()
                         )
                     );
                     previousSide = visibleSide;

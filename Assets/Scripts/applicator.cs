@@ -7,7 +7,8 @@ using UnityEngine;
 public class applicator : MonoBehaviour {
     public Material[] material;
     Renderer rend;
-    // Cal: how many counterbalancing conditions we support
+
+    // Cal: how many counterbalancing conditions we currently support
     // TODO: integrate this with an external list of conditions
     public static readonly long ConditionCount = 36;
     public static long Condition = -1;
@@ -18,7 +19,7 @@ public class applicator : MonoBehaviour {
 
         rend = GetComponent<Renderer>();
         rend.enabled = true;
-        // Cal: instead of using a game object for this use DataFarmer
+        // Cal: instead of using a game object for the Condition get it from ParticipantStatus
         // rend.materials = createSet(int.Parse(GameObject.FindGameObjectsWithTag("MainCamera")[0].GetComponent<CustomTag>().getTag(0)), name.Replace("(Clone)", ""));
         rend.materials = createSet(name.Replace("(Clone)", ""));
         Debug.Log("ID: " + int.Parse(GameObject.FindGameObjectsWithTag("MainCamera")[0].GetComponent<CustomTag>().getTag(0)));
@@ -76,7 +77,7 @@ public class applicator : MonoBehaviour {
         are I1, P1-6 and so on. The combination is selected based on the subject number.
         */
 
-        // Cal: setting this explicitly at the start of the experiment
+        // Cal: setting this explicitly at the start of the experiment (see ParticipantStatus)
         // int select = subject % 36; 
 
         //initialize vars representing features and placements

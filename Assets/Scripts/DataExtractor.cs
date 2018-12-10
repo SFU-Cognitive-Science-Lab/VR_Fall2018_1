@@ -28,7 +28,8 @@ public class DataExtractor : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        // Hey Cal. Since this runs only on the initial startup of the program, the distance travelled variable is actually better described as net displacement from origin.
+        // Hey Cal. Since this runs only on the initial startup of the program, the distance travelled variable
+        // is actually better described as net displacement from origin.
         // If we were wanting to grab the distance between fixations, we would need a different calculation - RCAB
         previousPosition = transform.position;
 

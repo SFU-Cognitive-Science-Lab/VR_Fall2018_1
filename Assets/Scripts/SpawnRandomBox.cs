@@ -71,7 +71,7 @@ public class SpawnRandomBox : MonoBehaviour {
             // Spawn Random Box
             //Transform randomBox = Instantiate(boxPrefabs[Random.Range(0, boxPrefabs.Count)]); //boxPrefabs[0]); // 
             Transform randomBox = Instantiate(boxPrefabs[cubeCount]);
-            DataFarmer.GetInstance().SetCube(randomBox);
+            ParticipantStatus.GetInstance().SetCube(randomBox);
             randomBox.position = spawnPoint.position;
             randomBox.rotation = spawnPoint.rotation * Quaternion.Euler(60, 0, 45);
 

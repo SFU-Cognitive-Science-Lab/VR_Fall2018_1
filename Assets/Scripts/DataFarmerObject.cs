@@ -14,11 +14,12 @@ public class DataFarmerObject : IDataFarmerObject
     {
         this.tag = tag;
         this.timestamp = Time.time;
-        this.participant = DataFarmer.GetInstance().GetParticipant();
-        this.trial = DataFarmer.GetInstance().GetTrial();
-        this.cube = DataFarmer.GetInstance().GetCube();
-        this.condition = DataFarmer.GetInstance().GetCondition();
-        this.category = DataFarmer.GetInstance().GetCategory();
+        ParticipantStatus ps = ParticipantStatus.GetInstance();
+        this.participant = ps.GetParticipant();
+        this.trial = ps.GetTrial();
+        this.cube = ps.GetCube();
+        this.condition = ps.GetCondition();
+        this.category = ps.GetCategory();
     }
     public float GetTimestamp()
     {

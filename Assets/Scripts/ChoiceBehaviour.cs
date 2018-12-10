@@ -67,7 +67,7 @@ public class ChoiceBehaviour : MonoBehaviour {
                     foreach (GameObject cube in currentObjs)
                     {
                         string chosenTag = cube.GetComponent<CustomTag>().getTag(0);
-                        DataFarmer.GetInstance().SetChoice(chosenTag);
+                        ParticipantStatus.GetInstance().SetChoice(chosenTag);
 
                         if (chosenTag == cTag)
                         {
