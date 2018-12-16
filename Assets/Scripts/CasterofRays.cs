@@ -5,16 +5,40 @@ using System.Collections.Generic;
 public class CasterofRays : MonoBehaviour
 {
     // create a variable which allows us to specify which layers are interacted with
+    public bool debug;
     public LayerMask mask;
     public static string ObjUnderReticle;
-    public static readonly int MAXOBJECTS = 30;
+    public static readonly int MAXOBJECTS = 1000;
     private static int last = 0;
     private static string[] RecentObjects = new string[MAXOBJECTS];
-    string HitInfoString;
-    
+    private string HitInfoString;
+    private float lastUpdate = 0;
+    private double frameCount = 0;
+
+    private void Start()
+    {
+        lastUpdate = 0;
+        frameCount = 0;
+    }
+
 
     void Update()
     {
+        // Cal: sanity check to see if MAXOBJECTS makes sense
+        if (debug)
+        {
+            frameCount++;
+            if (lastUpdate >= 0)
+            {
+                if (Time.time - lastUpdate >= 1)
+                {
+                    Debug.Log(string.Format("Frame count was {0} at {1}", frameCount, lastUpdate));
+                }
+                frameCount = 0;
+            }
+            lastUpdate = Time.time;
+        }
+
         // Updates the position of the player camera
         Ray ray = new Ray(transform.position, transform.forward);
 

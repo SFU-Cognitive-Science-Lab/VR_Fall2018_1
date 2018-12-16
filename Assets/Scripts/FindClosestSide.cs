@@ -59,7 +59,7 @@ public class FindClosestSide : MonoBehaviour {
                     // the last Vector3 is a placeholder for the cumulative movement of the head and hand controllers
                     DataFarmer.GetInstance().Save(
                         new DFFixation(
-                            angles[1], angles[2], angles[0],
+                            angles[UP], angles[FORWARD], angles[RIGHT],
                             dirStrings[visibleSide],
                             CasterofRays.MostCommonObject(),
                             ParticipantStatus.GetInstance().DisplacementsToString()

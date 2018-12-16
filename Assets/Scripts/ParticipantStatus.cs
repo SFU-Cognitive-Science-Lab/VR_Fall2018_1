@@ -15,11 +15,15 @@ public class ParticipantStatus
     // not having this set to a sensible value is a show stopper
     // we really should not be continuing in that case
     // TODO: figure out best way to kill the run if there are conf errors
+    //       maybe we should simply not start until this is set?
     private long participant = NO_PARTICIPANT;
 
     // trial == iteration of learning using a randomized cube
     // run == group of trials for a participant
     private long trial = 0;
+
+    // answers give at each trial
+    private SortedDictionary<long, string> answers = new SortedDictionary<long, string>();
 
     // condition == which set of cubes -> categories was chosen
     // this affects overall what the participant sees during the experiment
@@ -147,19 +151,6 @@ public class ParticipantStatus
         return cube.GetComponent<CustomTag>().getTag(0).Substring(0, 1);
     }
 
-    // Because the ChoiceBehavior.cs script is getting invoked many times, 
-    // keep the choice multiple times but report it once
-    public ParticipantStatus SetChoice(string choice)
-    {
-        this.choice = choice;
-        return this;
-    }
-
-    public string GetChoice()
-    {
-        return this.choice;
-    }
-
     // used by the DistanceTravelled.cs script to save the displacements of something
     public void UpdateDisplacement(string tag, float displacement)
     {
@@ -184,5 +175,25 @@ public class ParticipantStatus
             sb.AppendFormat("{0}={1}/{2},", kv.Key, kv.Value.Value, kv.Value.Key);
         }
         return sb.ToString();
+    }
+
+    // this assumes we've had at least one trial and will only accept the first answer
+    public bool SetChoice(string ans)
+    {
+        if (answers.ContainsKey(trial)) return false;
+        answers.Add(trial, ans);
+        return true;
+    }
+
+    public string GetLastChoice()
+    {
+        if (trial > 0) return answers[trial];
+        return null;
+    }
+
+    public string GetTrialChoice(long t)
+    {
+        if (answers.ContainsKey(t)) return answers[t];
+        return null;
     }
 }

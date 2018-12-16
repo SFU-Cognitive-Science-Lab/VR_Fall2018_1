@@ -1,4 +1,5 @@
-﻿using System;
+﻿// using Newtonsoft.Json.Linq; TODO: need to figure out how to include this in the package
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -35,6 +36,8 @@ public class DataFarmer {
     private static string CONFIG_FILE;
     private static string REMOTE_URI;
     private static string REMOTE_SECRET;
+    private static string ARRANGEMENTS_FILE; // where to store maps of categories to cubes
+    private static string ARRANGEMENT_DIMS = "3x2"; // type of stimuli to get
     private static readonly string DEFAULT_LOG = "df.csv";
     private static string LOCAL_LOG = DefaultLog();
 
@@ -59,6 +62,7 @@ public class DataFarmer {
     {
         GetConfig();
         Login();
+        LoadCubes();
     }
 
     private static string GetDesktop()
@@ -99,12 +103,18 @@ public class DataFarmer {
                 }
                 string name = lineMatch.Groups["name"].ToString().ToLower();
                 string value = Regex.Replace(lineMatch.Groups["value"].ToString(), @"\r\n?|\n", "");
+                Regex dimsPat = new Regex(@"^\d+x\d+$");
                 switch (name)
                 {
                     case "url": case "uri": REMOTE_URI = value; break;
                     case "secret": case "password": REMOTE_SECRET = value; break;
                     case "log": LOCAL_LOG = value; break;
                     case "buffer": BUFFER_FULL = int.Parse(value); break;
+                    case "arrangements": ARRANGEMENTS_FILE = value; break;
+                    case "dims":
+                        if (dimsPat.IsMatch(value)) { ARRANGEMENT_DIMS = value; }
+                        else throw new FormatException("dims should be NxM");
+                        break;
                     default: Debug.Log(string.Format("don't know what {0} is", name)); continue;
                 }
                 Debug.Log(string.Format("set '{0}' to '{1}'.\n", name, value));
@@ -125,69 +135,36 @@ public class DataFarmer {
         return this;
     }
 
-
-    // logs in and as a side effect gets our auth cookie - needed for all other requests
-    private bool Login()
+    // a place for the mapping data from categories to cubes
+    // this must exist for the experiment to run
+    public object LoadCubes()
     {
-        loggedin = false;
-        if (REMOTE_URI == null || REMOTE_SECRET == null)
+        if (!File.Exists(ARRANGEMENTS_FILE))
         {
-            Debug.Log("DataFarmer missing configuation needed to log in!");
+            if (!ImportCubes())
+            {
+                throw new IOException("Could not download stimuli map");
+            }
+        }
+        string arrangements;
+        using (StreamReader reader = File.OpenText(ARRANGEMENTS_FILE))
+        {
+            arrangements = reader.ReadToEnd();
+            // return JObject.Parse(arrangements);
+        }
+        return arrangements;
+    }
+    
+    private bool ImportCubes()
+    {
+        string arrangements = GetRequest(string.Format("{0}/arrangements/{1}", REMOTE_URI, ARRANGEMENT_DIMS));
+        Regex errPat = new Regex(@"^ERROR:");
+        if (arrangements == null || arrangements == "" || errPat.IsMatch(arrangements))
+        {
             return false;
         }
-        using (webClient = GetNewWebClient())
-        {
-            string content = webClient.DownloadString(makeNonce().Uri(string.Format("{0}/login", REMOTE_URI)));
-            Debug.Log("login result: " + content);
-            if (content.Contains("OK"))
-            {
-                loggedin = true;
-            }
-            WebHeaderCollection headers = webClient.ResponseHeaders;
-            int i = 0;
-            for (; i < headers.Count; i++)
-            {
-                Debug.Log(headers.GetKey(i) + ": " + headers.Get(i));
-                if (headers.GetKey(i) == "Set-Cookie")
-                {
-                    auth = headers.Get(i);
-                    Debug.Log(string.Format("{0}", auth));
-                    break;
-                }
-            }
-            webClient.Dispose();
-        }
-        return loggedin;
-    }
-
-    // tools for making basic requests - we must be logged in to use them
-    // Post uses the http POST method and expects extra data to send
-    private string PostRequest(string uri, string dataString)
-    {
-        string result = null;
-        using (webClient = GetNewWebClient())
-        {
-            // if this auth cookie is invalid nothing will work ...
-            webClient.Headers.Add("Content-Type", "text/plain");
-            webClient.Headers.Add("Cookie", auth);
-            result = webClient.UploadString(uri, "POST", dataString);
-        }
-        webClient.Dispose();
-        return result;
-    }
-
-    // Get uses http's GET method and only needs a url
-    private string GetRequest(string uri)
-    {
-        string result = null;
-        using (webClient = GetNewWebClient())
-        {
-            webClient.Headers.Add("Content-Type", "text/plain");
-            webClient.Headers.Add("Cookie", auth);
-            result = webClient.DownloadString(uri);
-        }
-        webClient.Dispose();
-        return result;
+        File.WriteAllText(ARRANGEMENTS_FILE, arrangements);
+        return true;
     }
 
     // make a participant id if we don't have one already
@@ -201,8 +178,9 @@ public class DataFarmer {
     // Saving the Data Chunk to File and remotely
     // on error does a lot of complaining and will throw an exception if no data can be saved
     public void Save (DataFarmerObject thingToSave) {
-        
-        // Since this section is called every frame, the data.add line will continue to receive a new line of data on every iteration until the BUFFER is reached
+
+        // Since this section is called every frame, the data.add line will continue 
+        // to receive a new line of data on every iteration until the BUFFER is reached
         data.Add(thingToSave);
 
         if (data.Count == BUFFER_FULL)
@@ -293,12 +271,78 @@ public class DataFarmer {
         }
         return saved;
     }
+
+    // various web related functions
     // gets a very tolerant web client 
     private WebClient GetNewWebClient()
     {
         // this line is needed for https to work with our self-signed certificates
         ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
         return new WebClient();
+    }
+
+    // logs in and as a side effect gets our auth cookie - needed for all other requests
+    private bool Login()
+    {
+        loggedin = false;
+        if (REMOTE_URI == null || REMOTE_SECRET == null)
+        {
+            Debug.Log("DataFarmer missing configuation needed to log in!");
+            return false;
+        }
+        using (webClient = GetNewWebClient())
+        {
+            string content = webClient.DownloadString(makeNonce().Uri(string.Format("{0}/login", REMOTE_URI)));
+            Debug.Log("login result: " + content);
+            if (content.Contains("OK"))
+            {
+                loggedin = true;
+            }
+            WebHeaderCollection headers = webClient.ResponseHeaders;
+            int i = 0;
+            for (; i < headers.Count; i++)
+            {
+                Debug.Log(headers.GetKey(i) + ": " + headers.Get(i));
+                if (headers.GetKey(i) == "Set-Cookie")
+                {
+                    auth = headers.Get(i);
+                    Debug.Log(string.Format("{0}", auth));
+                    break;
+                }
+            }
+            webClient.Dispose();
+        }
+        return loggedin;
+    }
+
+    // tools for making basic requests - we must be logged in to use them
+    // Post uses the http POST method and expects extra data to send
+    private string PostRequest(string uri, string dataString)
+    {
+        string result = null;
+        using (webClient = GetNewWebClient())
+        {
+            // if this auth cookie is invalid nothing will work ...
+            webClient.Headers.Add("Content-Type", "text/plain");
+            webClient.Headers.Add("Cookie", auth);
+            result = webClient.UploadString(uri, "POST", dataString);
+        }
+        webClient.Dispose();
+        return result;
+    }
+
+    // Get uses http's GET method and only needs a url
+    private string GetRequest(string uri)
+    {
+        string result = null;
+        using (webClient = GetNewWebClient())
+        {
+            webClient.Headers.Add("Content-Type", "text/plain");
+            webClient.Headers.Add("Cookie", auth);
+            result = webClient.DownloadString(uri);
+        }
+        webClient.Dispose();
+        return result;
     }
 
     // how to hide sending the actual password over the network
@@ -323,7 +367,7 @@ public class DataFarmer {
 
         // another architecture would be to have MakeCode be a callback
         private string Encode(string secret)
-        { 
+        {
             using (SHA256 sha256Hash = SHA256.Create())
             {
                 // ComputeHash - returns byte array  

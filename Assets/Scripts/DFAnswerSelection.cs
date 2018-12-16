@@ -4,11 +4,18 @@ using System;
 public class DFAnswerSelection: DataFarmerObject
 {
     private string chosenAnswer;
+    private ParticipantStatus ps = ParticipantStatus.GetInstance();
 
-	public DFAnswerSelection(): base("answer")
+    public DFAnswerSelection() : base("answer")
     {
-        this.chosenAnswer = ParticipantStatus.GetInstance().GetChoice();
-	}
+        this.chosenAnswer = ps.GetLastChoice();
+    }
+
+    public DFAnswerSelection(string choice) : base("answer")
+    {
+        ps.SetChoice(choice);
+        this.chosenAnswer = ps.GetLastChoice();
+    }
 
     public override string Serialize()
     {

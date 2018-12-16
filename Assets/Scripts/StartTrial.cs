@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SaveAnswer : MonoBehaviour {
+public class StartTrial : MonoBehaviour {
     private ParticipantStatus ps;
 
 	// Use this for initialization
@@ -15,7 +15,7 @@ public class SaveAnswer : MonoBehaviour {
 	
 	public void OnTriggerExit(Collider other)
     {
-        ps.GetDataFarmer().Save(new DFAnswerSelection());
         ps.IncTrial();
+        Debug.Log(string.Format("Starting trial {0} at {1}", ps.GetTrial(), Time.time));
 	}
 }
