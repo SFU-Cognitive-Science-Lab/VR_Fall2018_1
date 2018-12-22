@@ -55,20 +55,23 @@ public class ChoiceBehaviour : MonoBehaviour {
     public void OnTriggerStay(Collider other)
     {
 
-        if (leftController.controller.GetPress(SteamVR_Controller.ButtonMask.Trigger) || rightController.controller.GetPress(SteamVR_Controller.ButtonMask.Trigger))
+        if (leftController.controller.GetPress(SteamVR_Controller.ButtonMask.Trigger) 
+            || rightController.controller.GetPress(SteamVR_Controller.ButtonMask.Trigger))
         {
             if (cTag != "NEXT")
             {
                 if (firstChoice == true)
                 {
                     this.GetComponent<CustomTag>().buttonTagBehaviour(cTag); // Call custom tag top set correct/incorrect
-                    
+
+                    // string chosenTag = cube.GetComponent<CustomTag>().getTag(0);
+                    string correctTag = ParticipantStatus.GetInstance().GetCategory();
+                    // this gets repeated alot: Debug.Log("cTag " + cTag + " chosenTag " + correctTag);
+
                     GameObject[] currentObjs = GameObject.FindGameObjectsWithTag("Interactable Object");
                     foreach (GameObject cube in currentObjs)
                     {
-                        string chosenTag = cube.GetComponent<CustomTag>().getTag(0);
-
-                        if (chosenTag == cTag)
+                        if (correctTag == cTag)
                         {
                             //Correct Choice == change this to green, others to grey, next to blue
                             this.GetComponent<Renderer>().material = correctMat;
@@ -100,7 +103,8 @@ public class ChoiceBehaviour : MonoBehaviour {
                                 {
                                     if (choices[i].GetComponent<CustomTag>().getTag(0) != "NEXT")
                                     {
-                                        if (choices[i].GetComponent<CustomTag>().getTag(0) != cube.GetComponent<CustomTag>().getTag(0))
+                                        // if (choices[i].GetComponent<CustomTag>().getTag(0) != cube.GetComponent<CustomTag>().getTag(0))
+                                        if (choices[i].GetComponent<CustomTag>().getTag(0) != correctTag)
                                         { //if not next AND not correct choice
                                             choices[i].GetComponent<Renderer>().material = neutralMat;
                                             choices[i].GetComponent<ChoiceBehaviour>().setFirstChoice(false);
@@ -124,25 +128,16 @@ public class ChoiceBehaviour : MonoBehaviour {
             }
             else //Player clicked next button
             {
-                //if(firstChoice != true)
-                //{
-                    ResetButtons();
-                //}
+                ResetButtons();
             }
         }
-    }
-
-    public void OnTriggerExit(Collider other)
-    {/*
-        if (cTag == "NEXT" && firstChoice != true){
-            ResetButtons();
-        }*/
     }
 
     private void ResetButtons()
     {
         //Despawn current box
         this.GetComponent<DespawnObject>().buttonDespawn();
+
         //Change Colors/underlying variables
         for(int i = 0; i < choices.Count; i++)
         {
@@ -158,80 +153,8 @@ public class ChoiceBehaviour : MonoBehaviour {
             }
         }
 
-        //Spawn in new box
+        //Spawn new box
         this.GetComponent<SpawnRandomBox>().spawn();
         
     }
-
-    public void Activate()
-    {
-        /*
-        if (controller.triggerPressed == true) { 
-            Debug.Log("A trigger has been pressed");
-        }*/
-
-
-        //if (leftController.controller.GetPress(SteamVR_Controller.ButtonMask.Trigger) || rightController.controller.GetPress(SteamVR_Controller.ButtonMask.Trigger))
-        //{
-        //    if (firstChoice == true)
-        //    {
-        //        GameObject[] currentObjs = GameObject.FindGameObjectsWithTag("Interactable Object");
-        //        foreach (GameObject cube in currentObjs)
-        //        {
-        //            if (cube.GetComponent<CustomTag>().getTag(0) == this.GetComponent<CustomTag>().getTag(0))
-        //            {
-        //                //Correct Choice == change this to green, others to grey, next to blue
-        //                this.GetComponent<Renderer>().material = correctMat;
-
-        //                for (int i = 0; i < choices.Count; i++)
-        //                {
-        //                    if (choices[i] != gameObject)
-        //                    {
-        //                        if (choices[i].GetComponent<CustomTag>().getTag(0) != "NEXT") //Set all other buttons to graey.
-        //                        {
-        //                            choices[i].GetComponent<Renderer>().material = neutralMat;
-        //                            choices[i].GetComponent<ChoiceBehaviour>().setFirstChoice(false);
-        //                        }
-        //                        else //next button to blue
-        //                        {
-        //                            choices[i].GetComponent<Renderer>().material = nextMat;
-        //                            choices[i].GetComponent<ChoiceBehaviour>().setFirstChoice(false);
-        //                        }
-        //                    }
-        //                }
-        //            }
-        //            else
-        //            {
-        //                //Incorrect choice == change this to red, correct to green, others to grey, next to blue
-        //                this.GetComponent<Renderer>().material = wrongMat;
-        //                for (int i = 0; i < choices.Count; i++)
-        //                {
-        //                    if (choices[i] != gameObject)
-        //                    {
-        //                        if (choices[i].GetComponent<CustomTag>().getTag(0) != "NEXT")
-        //                        {
-        //                            if (choices[i].GetComponent<CustomTag>().getTag(0) != cube.GetComponent<CustomTag>().getTag(0))
-        //                            { //if not next AND not correct choice
-        //                                choices[i].GetComponent<Renderer>().material = neutralMat;
-        //                                choices[i].GetComponent<ChoiceBehaviour>().setFirstChoice(false);
-        //                            }
-        //                            else //Not next AND correct choice
-        //                            {
-        //                                choices[i].GetComponent<Renderer>().material = correctMat;
-        //                                choices[i].GetComponent<ChoiceBehaviour>().setFirstChoice(false);
-        //                            }
-        //                        }
-        //                        else //next button
-        //                        {
-        //                            choices[i].GetComponent<Renderer>().material = nextMat;
-        //                            choices[i].GetComponent<ChoiceBehaviour>().setFirstChoice(false);
-        //                        }
-        //                    }
-        //                }
-        //            }
-        //        }
-        //    }
-        //}
-    }
-
 }

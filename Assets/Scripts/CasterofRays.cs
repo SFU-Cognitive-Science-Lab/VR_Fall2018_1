@@ -8,7 +8,8 @@ public class CasterofRays : MonoBehaviour
     public bool debug;
     public LayerMask mask;
     public static string ObjUnderReticle;
-    public static readonly int MAXOBJECTS = 1000;
+    // our current set up does update 90 times per second - use debug = true to recalibrate
+    public static readonly int MAXOBJECTS = 90;
     private static int last = 0;
     private static string[] RecentObjects = new string[MAXOBJECTS];
     private string HitInfoString;
@@ -33,10 +34,10 @@ public class CasterofRays : MonoBehaviour
                 if (Time.time - lastUpdate >= 1)
                 {
                     Debug.Log(string.Format("Frame count was {0} at {1}", frameCount, lastUpdate));
+                    lastUpdate = Time.time;
+                    frameCount = 0;
                 }
-                frameCount = 0;
             }
-            lastUpdate = Time.time;
         }
 
         // Updates the position of the player camera

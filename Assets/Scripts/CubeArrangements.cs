@@ -1,44 +1,59 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 using UnityEngine;
+
 
 // stores all possible groups of category/cube maps for the experiment
 // one map group is picked for each participant - this is what the participant has to learn
 public class CubeArrangements
 {
-    private string name { get; set; }
-    private List<List<CubeTuple>> Arrangements { get; set; }
-   
+    // Arrangements == our set of counterbalancing conditions
+    // first list is the set of counterbalancing arrangements of cat -> cubes
+    // second list is one cat -> cube mapping
+    // third list is the 3 pieces of data needed to make one cube
+    // ColorShapeRotation describes the properties of one axis (l/r, t/b, f/b)
+    // data may be somewhat massaged to make it easier to work with in matlab
+    // for example the category is saved redundantly for each dimension
+    // this may change ... example:
+    // [[[{"cat":"c0","color":"r","rotation":0,"shape":"O"},{"cat":"c0","color":"b","rotation":120,"shape":"A"},{"cat":"c0","color":"g","rotation":240,"shape":"@"}], ...
+    private List<List<List<ColorShapeRotation>>> Arrangements { get; set; }
+
+    // the arrangements string comes from a JSON data file 
+    // see experiments.config.txt arrangements key or DataFarmer for where this is
+    // the file is derived from an external web application
     public CubeArrangements(string arrangements)
     {
-        // Unity's json parser can only accept an object as input for some reason
-        // but to make it easier to use this data in matlab it was made into arrays of arrays
-        Arrangements = 
-            JsonUtility.FromJson<List<List<CubeTuple>>>("{\"arrangements\":" + arrangements+"}");
-        foreach (List<CubeTuple> arr in Arrangements)
+        Arrangements = JsonConvert.DeserializeObject<List<List<List<ColorShapeRotation>>>>(arrangements);
+        foreach (List<List<ColorShapeRotation>> arr in Arrangements)
         {
             Debug.Log(string.Format("we have {0} options", arr.Count));
         }
-        
+    }
+
+    public bool IsEmpty()
+    {
+        return (Arrangements.Count == 0);
     }
 
     public int CountArrangements()
     {
-        return (Arrangements.Count == 0 ? 36: Arrangements.Count);
+        return Arrangements.Count;
     }
 
     public int CountCubes(int arrangement)
     {
+        if (IsEmpty()) return 0;
         return Arrangements[arrangement].Count;
     }
 
     public List<CubeTuple> Shuffle(int arrangement)
     {
-        List<CubeTuple> arr = Arrangements[arrangement];
+        List<List<ColorShapeRotation>> arr = Arrangements[arrangement];
         CubeTuple[] shuffled = new CubeTuple[arr.Count];
         int i = 0;
-        foreach (CubeTuple c in arr)
+        foreach (var c in arr)
         {
-            shuffled[i] = c;
+            shuffled[i] = new CubeTuple(c);
             i++;
         }
         System.Random random = new System.Random();

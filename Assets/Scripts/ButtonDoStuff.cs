@@ -14,19 +14,16 @@ public class ButtonDoStuff : MonoBehaviour {
     // Use this for initialization
     void Start () {
         // TODO Cal: we should definitely complain and abort if the id doesn't show up
-        // as that would mean we lost our connection to mary
+        // as that would mean we lost our connection to our external host
         participantID.text = ps.GetParticipantAsString();
     }
-	
-	// Update is called once per frame
-	void Update () {
-	}
 
     public void action()
     {
         camVR.GetComponent<CustomTag>().setTag(0, participantID.text);
         menu.SetActive(false);
         ps.ConditionFromParticipant();
+        Debug.Log("condition " + ps.GetCondition() + " for " + ps.GetParticipant());
     }
 
 }

@@ -1,9 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 
 public class CubeTuple
 {
     public List<ColorShapeRotation> cube { get; set; }
 
+    // the json parser seems to like simpler data structures so we don't try and translate 
+    // the cube data into this object directly - see CubeArrangements.cs
+    public CubeTuple(List<ColorShapeRotation> cube)
+    {
+        this.cube = cube;
+    }
+
+    // how our categories are translated into game categories
     public static readonly Dictionary<string, string> catmap = new Dictionary<string, string>
     {
         { "c0", "A" },
@@ -12,6 +21,7 @@ public class CubeTuple
         { "c3", "D" },
     };
 
+    // categories are stored per axis to make the data structure less complex for matlab
     public string GetCategory()
     {
         return catmap[cube[0].cat];

@@ -23,13 +23,12 @@ public class ParticipantStatus
     // run == group of trials for a participant
     private long trial = 0;
 
-    // answers give at each trial
+    // answers = category chosen by participant at each trial
     private SortedDictionary<long, string> answers = new SortedDictionary<long, string>();
 
     // condition == which set of cubes -> categories was chosen
     // this affects overall what the participant sees during the experiment
     // we need to check this to ensure counterbalancing is correct
-    // we assume we know what this map is (maybe it doesn't matter?)
     private int condition = NO_ARRANGEMENT;
 
     // which cube got invoked for a given learning trial
@@ -172,22 +171,12 @@ public class ParticipantStatus
         return this.condition;
     }
 
-    public ParticipantStatus SetCube(Transform cube)
-    {
-        this.cube = cube;
-        return this;
-    }
-
-    public Transform GetCube()
-    {
-        return this.cube;
-    }
-
     // See ChoiceBehavior.cs for examples of how this is used
     public string GetCategory()
     {
-        if (cube == null) return "";
-        return cube.GetComponent<CustomTag>().getTag(0).Substring(0, 1);
+        if (Cube < 0) return "";
+        if (Cubes == null) return "";
+        return Cubes[Cube].GetCategory();
     }
 
     // used by the DistanceTravelled.cs script to save the displacements of something

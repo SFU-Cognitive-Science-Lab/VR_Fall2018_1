@@ -8,7 +8,6 @@ public class DataFarmerObject : IDataFarmerObject
     public long trial;
     public int condition;
     public string category;
-    public Transform cube;
 
     public DataFarmerObject(string tag)
     {
@@ -17,7 +16,6 @@ public class DataFarmerObject : IDataFarmerObject
         ParticipantStatus ps = ParticipantStatus.GetInstance();
         this.participant = ps.GetParticipant();
         this.trial = ps.GetTrial();
-        this.cube = ps.GetCube();
         this.condition = ps.GetCondition();
         this.category = ps.GetCategory();
     }
@@ -39,12 +37,7 @@ public class DataFarmerObject : IDataFarmerObject
     }
     public virtual string Serialize()
     {
-        string cubetag = "";
-        if (cube != null)
-        {
-            cubetag = cube.name;
-        }
-        return string.Format("{0},{1},{2},{3},{4},{5},{6}", 
-            tag, participant, timestamp, condition, trial, cubetag, category);
+        return string.Format("{0},{1},{2},{3},{4},{5}", 
+            tag, participant, timestamp, condition, trial, category);
     }
 }
