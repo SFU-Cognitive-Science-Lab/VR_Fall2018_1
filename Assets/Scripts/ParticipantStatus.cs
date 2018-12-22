@@ -9,6 +9,7 @@ using UnityEngine;
 public class ParticipantStatus 
 {
     public static readonly long NO_PARTICIPANT = -1;
+    public static readonly int NO_ARRANGEMENT = -1;
 
     // Participant Subject ID initially garnered from the external host
     // can also be set from the UI when the run starts
@@ -29,7 +30,7 @@ public class ParticipantStatus
     // this affects overall what the participant sees during the experiment
     // we need to check this to ensure counterbalancing is correct
     // we assume we know what this map is (maybe it doesn't matter?)
-    private int condition;
+    private int condition = NO_ARRANGEMENT;
 
     // which cube got invoked for a given learning trial
     private Transform cube;
@@ -96,6 +97,18 @@ public class ParticipantStatus
         return participant;
     }
 
+    // set the counterbalancing condition for this participant
+    public void SetArrangement(int arrangement)
+    {
+        this.condition = arrangement;
+    }
+
+    // gets the arrangement for this participant
+    public int GetArrangement()
+    {
+        return this.condition;
+    }
+
     // idea with the set methods is that they can be stringed together
     // ParticipantStatus.GetInstance().SetThing1(thing1).SetThing2(thing2)...
     public ParticipantStatus SetTrial(long trial)
@@ -115,16 +128,42 @@ public class ParticipantStatus
         return this.trial;
     }
 
-    public ParticipantStatus SetCondition(int condition)
+    public ParticipantStatus SetCondition(int arrangement)
     {
-        this.condition = condition;
+        if (arrangement < 0 || arrangement >= GetDataFarmer().CubeLists.CountArrangements())
+            throw new ArgumentException("arrangement is out of bounds");
+        this.condition = arrangement;
         return this;
+    }
+
+    // Convenience methods for getting descriptions of cubes:
+    // a run is a series of trials that iterate through a list of cubes
+    // when we get the end of a list we generate another 
+    private List<CubeTuple> Cubes;
+    private int Cube = -1;
+    public CubeTuple GetNextCube()
+    {
+        Cube++;
+        if (Cubes == null || Cube == Cubes.Count)
+        {
+            ResetCubes();
+            Cube = 0;
+        }
+        return Cubes[Cube];
+    }
+
+    // make a random permutation of a given list of cubes
+    private void ResetCubes()
+    {
+        if (this.condition == NO_ARRANGEMENT)
+            throw new ArgumentException("Need to set a condition for this participant!");
+        Cubes = GetDataFarmer().CubeLists.Shuffle(this.condition);
     }
 
     // used in the UI to set the set of cube/category mappings the participant will be learning
     public int ConditionFromParticipant()
     {
-        this.condition = (int)(participant % applicator.ConditionCount);
+        this.condition = (int)(participant % GetDataFarmer().CubeLists.CountArrangements());
         return this.condition;
     }
 

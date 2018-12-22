@@ -1,5 +1,4 @@
-﻿// using Newtonsoft.Json.Linq; TODO: need to figure out how to include this in the package
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -40,6 +39,9 @@ public class DataFarmer {
     private static string ARRANGEMENT_DIMS = "3x2"; // type of stimuli to get
     private static readonly string DEFAULT_LOG = "df.csv";
     private static string LOCAL_LOG = DefaultLog();
+
+    // Arrangements of cubes for counterbalancing stimuli
+    public CubeArrangements CubeLists;
 
     // Use this for initialization - Creates a "virtual" game object.
     public static DataFarmer GetInstance () {
@@ -135,9 +137,10 @@ public class DataFarmer {
         return this;
     }
 
+    // for counterbalancing - we want to give every participant a different set of cubes to learn
     // a place for the mapping data from categories to cubes
     // this must exist for the experiment to run
-    public object LoadCubes()
+    public void LoadCubes()
     {
         if (!File.Exists(ARRANGEMENTS_FILE))
         {
@@ -150,11 +153,13 @@ public class DataFarmer {
         using (StreamReader reader = File.OpenText(ARRANGEMENTS_FILE))
         {
             arrangements = reader.ReadToEnd();
-            // return JObject.Parse(arrangements);
+            CubeLists = new CubeArrangements(arrangements);
         }
-        return arrangements;
     }
-    
+
+    // this will grab them from the external server as a huge json string which we save to file
+    // subsequent runs will use this file rather than re-getting it so remove the "arrangements.json"
+    // file if you want to refresh the data
     private bool ImportCubes()
     {
         string arrangements = GetRequest(string.Format("{0}/arrangements/{1}", REMOTE_URI, ARRANGEMENT_DIMS));

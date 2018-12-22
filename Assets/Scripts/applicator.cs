@@ -3,15 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 //TODO: tidy things up into a nice function
+// see createSet() below with no arguments
 
 public class applicator : MonoBehaviour {
     public Material[] material;
     Renderer rend;
-
-    // Cal: how many counterbalancing conditions we currently support
-    // TODO: integrate this with an external list of conditions
-    public static readonly long ConditionCount = 36;
-    public static long Condition = -1;
 
     void Start()
     {
@@ -21,7 +17,8 @@ public class applicator : MonoBehaviour {
         rend.enabled = true;
         // Cal: instead of using a game object for the Condition get it from ParticipantStatus
         // rend.materials = createSet(int.Parse(GameObject.FindGameObjectsWithTag("MainCamera")[0].GetComponent<CustomTag>().getTag(0)), name.Replace("(Clone)", ""));
-        rend.materials = createSet(name.Replace("(Clone)", ""));
+        // rend.materials = createSet(name.Replace("(Clone)", ""));
+        rend.materials = createSet();
         Debug.Log("ID: " + int.Parse(GameObject.FindGameObjectsWithTag("MainCamera")[0].GetComponent<CustomTag>().getTag(0)));
     }
 
@@ -33,32 +30,59 @@ public class applicator : MonoBehaviour {
         return;
     }
 
+    // makes a cube from a description of the 3 sides
+    // example: [["c0","r","O",0],["c0","b","A",120],["c0","g","@",240]]
+    // where: 
 
     /* material is an array containing the base and feature materials-
     INITIAL MATERIAL ORDER
     [0] = base layer 
-    [1] = Red Diamond
-    [2] = Red Omega
-    [3] = Green Sprial
-    [4] = Green Bamboo
-    [5] = Blue Downward Triangle
-    [6] = Blue Upward Triangle
+    [1] = Red Diamond "D"
+    [2] = Red Omega "O"
+    [3] = Green Sprial "@"
+    [4] = Green Bamboo "="
+    [5] = Blue Downward Triangle "V"
+    [6] = Blue Upward Triangle "A"
+
+       MATLIST ORDER
+       [0] = base
+       [1] = right 120?
+       [2] = front 240?
+       [3] = left 120?
+       [4] = back 240?
+       [5] = top 0
+       [6] = bottom 0
+
     */
+    private int right = 1;
+    private int front = 2;
+    private int left = 3;
+    private int back = 4;
+    private int top = 5;
+    private int bottom = 6;
+
+    // I guess this is the current version of the "nice function"
+    // this pulls the materials based on what we get for
+    // the externally generated counterbalancing conditions
+    Material[] createSet()
+    {
+        CubeTuple c = ParticipantStatus.GetInstance().GetNextCube();
+        Material[] matlist = rend.materials;
+        foreach (ColorShapeRotation csr in c.cube)
+        {
+            foreach (int face in csr.GetFaces())
+            {
+                matlist[face] = rend.materials[csr.GetMaterial()];
+            }
+        }
+        return matlist;
+    }
 
     // Material[] createSet(int subject, string cube)
     Material[] createSet(string cube)
     {
         Material[] matlist = rend.materials;
         /*
-       MATLIST ORDER
-       [0] = base
-       [1] = right
-       [2] = front
-       [3] = left
-       [4] = back
-       [5] = top
-       [6] = bottom
-
         Function intakes the subject number and desired cube.
         It then determines what icons the features will have and where they will be placed.
         Based on this table:
@@ -87,13 +111,8 @@ public class applicator : MonoBehaviour {
         int F2y = 4;
         int F3x = 5;
         int F3y = 6;
-        
-        int right   = 1;
-        int front   = 2;
-        int left    = 3;
-        int back    = 4;
-        int top     = 5;
-        int bottom  = 6;
+
+        int Condition = ParticipantStatus.GetInstance().GetCondition();
 
         int c = 0;
         //This loop decides which set will belong to each feature
