@@ -23,7 +23,7 @@ public class CubeArrangements
 
     public int CountArrangements()
     {
-        return Arrangements.Count;
+        return (Arrangements.Count == 0 ? 36: Arrangements.Count);
     }
 
     public int CountCubes(int arrangement)

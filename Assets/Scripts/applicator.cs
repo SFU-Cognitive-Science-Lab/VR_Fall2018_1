@@ -17,8 +17,16 @@ public class applicator : MonoBehaviour {
         rend.enabled = true;
         // Cal: instead of using a game object for the Condition get it from ParticipantStatus
         // rend.materials = createSet(int.Parse(GameObject.FindGameObjectsWithTag("MainCamera")[0].GetComponent<CustomTag>().getTag(0)), name.Replace("(Clone)", ""));
-        // rend.materials = createSet(name.Replace("(Clone)", ""));
-        rend.materials = createSet();
+
+        // temporary hack to deal with broken json parser
+        if (DataFarmer.GetInstance().CubeLists.CountArrangements() == 36)
+        {
+            rend.materials = createSet(name.Replace("(Clone)", ""));
+        }
+        else
+        {
+            rend.materials = createSet();
+        }
         Debug.Log("ID: " + int.Parse(GameObject.FindGameObjectsWithTag("MainCamera")[0].GetComponent<CustomTag>().getTag(0)));
     }
 
