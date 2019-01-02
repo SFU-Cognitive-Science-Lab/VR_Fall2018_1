@@ -299,7 +299,7 @@ public class DataFarmer {
         {
             string content = webClient.DownloadString(makeNonce().Uri(string.Format("{0}/login", REMOTE_URI)));
             Debug.Log("login result: " + content);
-            if (content.Contains("OK"))
+            if (!content.Contains("ERROR:"))
             {
                 loggedin = true;
             }
