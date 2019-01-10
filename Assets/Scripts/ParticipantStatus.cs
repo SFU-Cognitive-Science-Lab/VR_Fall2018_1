@@ -170,8 +170,7 @@ public class ParticipantStatus
     {
         var cl = GetDataFarmer().CubeLists;
         int cubeset = (int)(participant % cl.CountCubesets());
-        var rand = new System.Random();
-        int arrangement = rand.Next(0, cl.CountArrangements(cubeset));
+        int arrangement = (int) (participant % cl.CountArrangements(cubeset));
 
         this.condition = new Condition(cubeset, arrangement);
 
