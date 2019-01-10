@@ -40,7 +40,7 @@ public class applicator : MonoBehaviour {
     // and maps the materials to the raw cube
     Material[] createSet()
     {
-        CubeTuple c = ParticipantStatus.GetInstance().GetNextCube();
+        CubeTuple c = ParticipantStatus.GetInstance().GetNextStimulus();
         Material[] matlist = rend.materials;
         matlist[0] = material[0];
         foreach (ColorShapeRotation csr in c.cube)

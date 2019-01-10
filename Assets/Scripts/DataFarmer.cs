@@ -40,7 +40,7 @@ public class DataFarmer {
     private static readonly string DEFAULT_LOG = "df.csv";
     private static string LOCAL_LOG = DefaultLog();
 
-    // Arrangements of cubes for counterbalancing stimuli
+    // Cubesets of cubes for counterbalancing stimuli
     public CubeArrangements CubeLists;
 
     // Use this for initialization - Creates a "virtual" game object.

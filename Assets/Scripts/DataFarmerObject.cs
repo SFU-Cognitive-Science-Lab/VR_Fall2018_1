@@ -6,7 +6,7 @@ public class DataFarmerObject : IDataFarmerObject
     protected float timestamp;
     public long participant;
     public long trial;
-    public int condition;
+    public ParticipantStatus.Condition condition;
     public string category;
 
     public DataFarmerObject(string tag)

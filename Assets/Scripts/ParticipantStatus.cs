@@ -6,7 +6,7 @@ using UnityEngine;
 // here we save everything that relates to the participant during a test run
 // when a DataFarmerObject is saved this data is used to flesh out the context
 // of the measurement
-public class ParticipantStatus 
+public class ParticipantStatus
 {
     public static readonly long NO_PARTICIPANT = -1;
     public static readonly int NO_ARRANGEMENT = -1;
@@ -29,7 +29,7 @@ public class ParticipantStatus
     // condition == which set of cubes -> categories was chosen
     // this affects overall what the participant sees during the experiment
     // we need to check this to ensure counterbalancing is correct
-    private int condition = NO_ARRANGEMENT;
+    private Condition condition = null;
 
     // which cube got invoked for a given learning trial
     private Transform cube;
@@ -54,7 +54,7 @@ public class ParticipantStatus
     private ParticipantStatus()
     {
         displacements = new Dictionary<string, KeyValuePair<float, float>>();
-    } 
+    }
 
     // this is mainly used when we get the answer during a trial to make code simpler
     public DataFarmer GetDataFarmer()
@@ -97,13 +97,13 @@ public class ParticipantStatus
     }
 
     // set the counterbalancing condition for this participant
-    public void SetArrangement(int arrangement)
+    public void SetArrangement(int cubeset, int arrangement)
     {
-        this.condition = arrangement;
+        this.condition = new Condition(cubeset, arrangement);
     }
 
     // gets the arrangement for this participant
-    public int GetArrangement()
+    public Condition GetArrangement()
     {
         return this.condition;
     }
@@ -127,11 +127,17 @@ public class ParticipantStatus
         return this.trial;
     }
 
-    public ParticipantStatus SetCondition(int arrangement)
+    public ParticipantStatus SetCondition(int cubeset, int arrangement)
     {
-        if (arrangement < 0 || arrangement >= GetDataFarmer().CubeLists.CountArrangements())
+        var cl = GetDataFarmer().CubeLists;
+
+        if (cubeset < 0 || cubeset >= cl.CountCubesets())
+            throw new ArgumentException("cubeset is out of bounds");
+
+        if (arrangement < 0 || arrangement >= cl.CountArrangements(cubeset))
             throw new ArgumentException("arrangement is out of bounds");
-        this.condition = arrangement;
+
+        this.condition = new Condition(cubeset, arrangement);
         return this;
     }
 
@@ -140,7 +146,7 @@ public class ParticipantStatus
     // when we get the end of a list we generate another 
     private List<CubeTuple> Cubes;
     private int Cube = -1;
-    public CubeTuple GetNextCube()
+    public CubeTuple GetNextStimulus()
     {
         Cube++;
         if (Cubes == null || Cube == Cubes.Count)
@@ -154,19 +160,25 @@ public class ParticipantStatus
     // make a random permutation of a given list of cubes
     private void ResetCubes()
     {
-        if (this.condition == NO_ARRANGEMENT)
+        if (this.condition == null)
             throw new ArgumentException("Need to set a condition for this participant!");
         Cubes = GetDataFarmer().CubeLists.Shuffle(this.condition);
     }
 
     // used in the UI to set the set of cube/category mappings the participant will be learning
-    public int ConditionFromParticipant()
+    public Condition ConditionFromParticipant()
     {
-        this.condition = (int)(participant % GetDataFarmer().CubeLists.CountArrangements());
+        var cl = GetDataFarmer().CubeLists;
+        int cubeset = (int)(participant % cl.CountCubesets());
+        var rand = new System.Random();
+        int arrangement = rand.Next(0, cl.CountArrangements(cubeset));
+
+        this.condition = new Condition(cubeset, arrangement);
+
         return this.condition;
     }
 
-    public int GetCondition()
+    public Condition GetCondition()
     {
         return this.condition;
     }
@@ -223,5 +235,24 @@ public class ParticipantStatus
     {
         if (answers.ContainsKey(t)) return answers[t];
         return null;
+    }
+
+    // the condition for this experiment is the set of cubes
+    // each participant should be evenly dispersed between the different 
+    // possible mappings of the cubes to categories
+    public class Condition {
+        public int cubeset { get; set;  } // there are only a small number of ways to generate groups of distinct cubes
+        public int arrangement { get; set;  } // out of these we should select one mapping of cubes to categories
+
+        public Condition(int c, int a)
+        {
+            cubeset = c;
+            arrangement = a;
+        }
+
+        public override string ToString()
+        {
+            return string.Format("{0}/{1}", cubeset, arrangement);
+        }
     }
 }
