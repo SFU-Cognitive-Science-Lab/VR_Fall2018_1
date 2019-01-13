@@ -7,8 +7,11 @@ public class StartTrial : MonoBehaviour {
 
 	public void OnTriggerExit(Collider other)
     {
-        ps.IncTrial();
-        Debug.Log(string.Format("Starting trial {0} at {1}", ps.GetTrial(), Time.time));
-        ps.GetDataFarmer().Save(new DFAnswerSelection(DFAnswerSelection.START));
-	}
+        // check if the participant made an answer then move on to next trial
+        // all this is now happening in ParticipantStatus.GetNextStimulus
+        if (ps.ChoiceMade())
+        {
+            Debug.Log(string.Format("Starting trial {0} at {1}", ps.GetTrial(), Time.time));
+        }
+    }
 }

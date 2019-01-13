@@ -8,14 +8,15 @@ using UnityEngine;
 public class CubeArrangements
 {
     // Cubesets == our set of counterbalancing conditions
-    // first list is the set of counterbalancing arrangements of cat -> cubes
-    // second list is one cat -> cube mapping
-    // third list is the 3 pieces of data needed to make one cube
+    // first list is organized by possible groups of cubes
+    // second list is a set of cat -> cube mapping arrangements
+    // third list is a single arrangement
+    // fourth list is the data needed to make one cube
     // ColorShapeRotation describes the properties of one axis (l/r, t/b, f/b)
     // data may be somewhat massaged to make it easier to work with in matlab
     // for example the category is saved redundantly for each dimension
     // this may change ... example:
-    // [[[{"cat":"c0","color":"r","rotation":0,"shape":"O"},{"cat":"c0","color":"b","rotation":120,"shape":"A"},{"cat":"c0","color":"g","rotation":240,"shape":"@"}], ...
+    // [[[[{"cat":"c0","color":"r","rotation":0,"shape":"O"},{"cat":"c0","color":"b","rotation":120,"shape":"A"},{"cat":"c0","color":"g","rotation":240,"shape":"@"}], ...
     private List<List<List<List<ColorShapeRotation>>>> Cubesets { get; set; }
 
     // the arrangements string comes from a JSON data file 

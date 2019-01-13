@@ -44,8 +44,10 @@ public class FindClosestSide : MonoBehaviour {
                     visibleSide = angles.ToList().IndexOf(max);
                 }
 
-                if (visibleSide != previousSide)
+                if (ps.IsTrialStart() || (visibleSide != previousSide))
                 {
+                    if (ps.IsTrialStart()) ps.UnsetTrialStart();
+
                     // the last Vector3 is a placeholder for the cumulative movement of the head and hand controllers
                     DataFarmer.GetInstance().Save(
                         new DFFixation(

@@ -14,17 +14,16 @@ public class ParticipantStatus
     // Participant Subject ID initially garnered from the external host
     // can also be set from the UI when the run starts
     // not having this set to a sensible value is a show stopper
-    // we really should not be continuing in that case
-    // TODO: figure out best way to kill the run if there are conf errors
-    //       maybe we should simply not start until this is set?
+    // we really should not be starting in that case
     private long participant = NO_PARTICIPANT;
 
     // trial == iteration of learning using a randomized cube
     // run == group of trials for a participant
     private long trial = 0;
+    private bool trialStart = false;
 
     // answers = category chosen by participant at each trial
-    private SortedDictionary<long, string> answers = new SortedDictionary<long, string>();
+    private SortedDictionary<long, string> answers;
 
     // condition == which set of cubes -> categories was chosen
     // this affects overall what the participant sees during the experiment
@@ -53,6 +52,7 @@ public class ParticipantStatus
     // if we use the config file here we should make a separate configuration module
     private ParticipantStatus()
     {
+        answers = new SortedDictionary<long, string>();
         displacements = new Dictionary<string, KeyValuePair<float, float>>();
     }
 
@@ -96,6 +96,88 @@ public class ParticipantStatus
         return participant;
     }
 
+    public bool ChoiceMade()
+    {
+        if (GetTrialChoice(this.trial) != null) return true;
+        return false;
+    }
+
+    public long IncTrial()
+    {
+        if (ChoiceMade())
+        {
+            this.trial++;
+        }
+        return this.trial;
+    }
+
+    public long GetTrial()
+    {
+        return this.trial;
+    }
+
+    public bool IsTrialStart()
+    {
+        return this.trialStart;
+    }
+
+    public void UnsetTrialStart()
+    {
+        this.trialStart = false;
+    }
+
+    // TODO: should this stuff be in its own class??
+    // this assumes we've had at least one trial and will only accept the first answer
+    public bool SetChoice(string ans)
+    {
+        if (answers.ContainsKey(trial)) return false;
+        answers.Add(trial, ans);
+        return true;
+    }
+
+    public string GetLastChoice()
+    {
+        if (trial > 0) return answers[trial];
+        return null;
+    }
+
+    public string GetTrialChoice(long t)
+    {
+        if (answers.ContainsKey(t)) return answers[t];
+        return null;
+    }
+
+    // TODO: this stuff should probably be in its own class
+    // used by the DistanceTravelled.cs script to save the displacements of something
+    public void UpdateDisplacement(string tag, float displacement)
+    {
+        var TimeVsDist = new KeyValuePair<float, float>(Time.time, displacement);
+        if (displacements.ContainsKey(tag))
+        {
+            displacements[tag] = TimeVsDist;
+        }
+        else
+        {
+            displacements.Add(tag, TimeVsDist);
+        }
+    }
+
+    // create a string that we can save of the last saved displacements
+    public string DisplacementsToString()
+    {
+        var sb = new StringBuilder();
+        foreach (var kv in displacements)
+        {
+            // probably want to think of a better way to present this information
+            sb.AppendFormat("{0}={1}/{2},", kv.Key, kv.Value.Value, kv.Value.Key);
+        }
+        return sb.ToString();
+    }
+
+    // TODO: this stuff that explictly references Cubes 
+    // and Cube specific data such as the 2 part condition 
+    // should probably exist in its own set of classes
+
     // set the counterbalancing condition for this participant
     public void SetArrangement(int cubeset, int arrangement)
     {
@@ -106,25 +188,6 @@ public class ParticipantStatus
     public Condition GetArrangement()
     {
         return this.condition;
-    }
-
-    // idea with the set methods is that they can be stringed together
-    // ParticipantStatus.GetInstance().SetThing1(thing1).SetThing2(thing2)...
-    public ParticipantStatus SetTrial(long trial)
-    {
-        if (trial > 0) this.trial = trial;
-        return this;
-    }
-
-    public ParticipantStatus IncTrial()
-    {
-        this.trial++;
-        return this;
-    }
-
-    public long GetTrial()
-    {
-        return this.trial;
     }
 
     public ParticipantStatus SetCondition(int cubeset, int arrangement)
@@ -154,6 +217,9 @@ public class ParticipantStatus
             ResetCubes();
             Cube = 0;
         }
+        this.trialStart = true;
+        IncTrial();
+        GetDataFarmer().Save(new DFAnswerSelection(DFAnswerSelection.START));
         return Cubes[Cube];
     }
 
@@ -188,52 +254,6 @@ public class ParticipantStatus
         if (Cube < 0) return "";
         if (Cubes == null) return "";
         return Cubes[Cube].GetCategory();
-    }
-
-    // used by the DistanceTravelled.cs script to save the displacements of something
-    public void UpdateDisplacement(string tag, float displacement)
-    {
-        var TimeVsDist = new KeyValuePair<float, float>(Time.time, displacement);
-        if (displacements.ContainsKey(tag))
-        {
-            displacements[tag] = TimeVsDist;
-        }
-        else
-        {
-            displacements.Add(tag, TimeVsDist);
-        }
-    }
-
-    // create a string that we can save of the last saved displacements
-    public string DisplacementsToString()
-    {
-        var sb = new StringBuilder();
-        foreach (var kv in displacements)
-        {
-            // probably want to think of a better way to present this information
-            sb.AppendFormat("{0}={1}/{2},", kv.Key, kv.Value.Value, kv.Value.Key);
-        }
-        return sb.ToString();
-    }
-
-    // this assumes we've had at least one trial and will only accept the first answer
-    public bool SetChoice(string ans)
-    {
-        if (answers.ContainsKey(trial)) return false;
-        answers.Add(trial, ans);
-        return true;
-    }
-
-    public string GetLastChoice()
-    {
-        if (trial > 0) return answers[trial];
-        return null;
-    }
-
-    public string GetTrialChoice(long t)
-    {
-        if (answers.ContainsKey(t)) return answers[t];
-        return null;
     }
 
     // the condition for this experiment is the set of cubes

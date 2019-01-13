@@ -4,10 +4,10 @@ public class DataFarmerObject : IDataFarmerObject
 {
     readonly protected string tag;
     protected float timestamp;
-    public long participant;
-    public long trial;
-    public ParticipantStatus.Condition condition;
-    public string category;
+    protected long participant;
+    protected long trial;
+    protected ParticipantStatus.Condition condition;
+    protected string category;
 
     public DataFarmerObject(string tag)
     {

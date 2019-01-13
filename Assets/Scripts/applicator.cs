@@ -40,11 +40,17 @@ public class applicator : MonoBehaviour {
     // and maps the materials to the raw cube
     Material[] createSet()
     {
+        // a CubeTuple is the 3 axes of the cube
         CubeTuple c = ParticipantStatus.GetInstance().GetNextStimulus();
         Material[] matlist = rend.materials;
+
+        // this is the basic background material for the cube
         matlist[0] = material[0];
+
+        // ColorShapeRotation describes one of the axes of the cube
         foreach (ColorShapeRotation csr in c.cube)
         {
+            // we dress the two faces for the axis with the appropriate material
             foreach (int face in csr.GetFaces())
             {
                 matlist[face] = material[csr.GetMaterial()];
