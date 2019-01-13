@@ -11,8 +11,6 @@ public class applicator : MonoBehaviour {
 
     void Start()
     {
-        Cubes cubes = new Cubes();
-
         rend = GetComponent<Renderer>();
         rend.enabled = true;
         Debug.Log(name);

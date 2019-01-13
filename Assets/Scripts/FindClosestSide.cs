@@ -51,9 +51,10 @@ public class FindClosestSide : MonoBehaviour {
                     // the last Vector3 is a placeholder for the cumulative movement of the head and hand controllers
                     DataFarmer.GetInstance().Save(
                         new DFFixation(
-                            angles[UP], angles[FORWARD], angles[RIGHT],
+                            "up="+angles[UP], 
+                            "forward="+angles[FORWARD], 
+                            "right="+angles[RIGHT],
                             dirStrings[visibleSide],
-                            CasterofRays.MostCommonObject(),
                             ps.DisplacementsToString()
                         )
                     );
@@ -61,7 +62,9 @@ public class FindClosestSide : MonoBehaviour {
                 }
                 
                 if (detailedLogging && measurements % 20 == 0) angleDisplay.text = 
-                       "right " + player.transform.forward[RIGHT]
+                       "participant " + ps.GetParticipantAsString() 
+                       + " condition " + ps.GetCondition().ToString() + "\n"
+                       + "right " + player.transform.forward[RIGHT]
                        + " up " + player.transform.forward[UP]
                        + "\n" + dirStrings[UP] + " " + angles[UP]
                        + ", " + dirStrings[RIGHT] + " " + angles[RIGHT]

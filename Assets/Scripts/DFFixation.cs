@@ -2,17 +2,15 @@
 
 public class DFFixation : DataFarmerObject {
     private string side;
-    private int up;
-    private int forward;
-    private int right;
-    private string pointingAt;
+    private string up;
+    private string forward;
+    private string right;
     private string displacement;
 
-	public DFFixation(int up, int forward, int right, string side, string pointingAt, string displacement): 
+	public DFFixation(string up, string forward, string right, string side, string displacement): 
         base("fixation")
     {
         this.side = side;
-        this.pointingAt = pointingAt;
         this.up = up;
         this.forward = forward;
         this.right = right;
@@ -21,7 +19,7 @@ public class DFFixation : DataFarmerObject {
 
     public override string Serialize()
     {
-        return string.Format("{0},{1},{2},{3},{4},{5},{6}\n",
-                base.Serialize(), up, forward, right, side, pointingAt, displacement);
+        return string.Format("{0},{1},{2},{3},{4},{5}\n",
+                base.Serialize(), up, forward, right, side, displacement);
     }
 }

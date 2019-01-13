@@ -137,7 +137,7 @@ public class ParticipantStatus
 
     public string GetLastChoice()
     {
-        if (trial > 0) return answers[trial];
+        if (trial >= 0) return answers[trial];
         return null;
     }
 
@@ -169,7 +169,7 @@ public class ParticipantStatus
         foreach (var kv in displacements)
         {
             // probably want to think of a better way to present this information
-            sb.AppendFormat("{0}={1}/{2},", kv.Key, kv.Value.Value, kv.Value.Key);
+            sb.AppendFormat("{0}={1},", kv.Key, kv.Value.Value);
         }
         return sb.ToString();
     }
@@ -179,13 +179,13 @@ public class ParticipantStatus
     // should probably exist in its own set of classes
 
     // set the counterbalancing condition for this participant
-    public void SetArrangement(int cubeset, int arrangement)
+    public void SetCatmap(int cubeset, int arrangement)
     {
         this.condition = new Condition(cubeset, arrangement);
     }
 
     // gets the arrangement for this participant
-    public Condition GetArrangement()
+    public Condition GetCatmap()
     {
         return this.condition;
     }
@@ -197,7 +197,7 @@ public class ParticipantStatus
         if (cubeset < 0 || cubeset >= cl.CountCubesets())
             throw new ArgumentException("cubeset is out of bounds");
 
-        if (arrangement < 0 || arrangement >= cl.CountArrangements(cubeset))
+        if (arrangement < 0 || arrangement >= cl.CountCatmaps(cubeset))
             throw new ArgumentException("arrangement is out of bounds");
 
         this.condition = new Condition(cubeset, arrangement);
@@ -234,13 +234,15 @@ public class ParticipantStatus
     // used in the UI to set the set of cube/category mappings the participant will be learning
     public Condition ConditionFromParticipant()
     {
-        var cl = GetDataFarmer().CubeLists;
-        int cubeset = (int)(participant % cl.CountCubesets());
-        int arrangement = (int) (participant % cl.CountArrangements(cubeset));
-
-        this.condition = new Condition(cubeset, arrangement);
-
-        return this.condition;
+        if (participant > 0)
+        {
+            var cl = GetDataFarmer().CubeLists;
+            int cubeset = (int)(participant % cl.CountCubesets());
+            int arrangement = (int)(participant % cl.CountCatmaps(cubeset));
+            this.condition = new Condition(cubeset, arrangement);
+            return this.condition;
+        }
+        else throw new MissingMemberException("Need to set participant");
     }
 
     public Condition GetCondition()
@@ -261,17 +263,17 @@ public class ParticipantStatus
     // possible mappings of the cubes to categories
     public class Condition {
         public int cubeset { get; set;  } // there are only a small number of ways to generate groups of distinct cubes
-        public int arrangement { get; set;  } // out of these we should select one mapping of cubes to categories
+        public int catmap { get; set;  } // out of these we should select one mapping of cubes to categories
 
         public Condition(int c, int a)
         {
             cubeset = c;
-            arrangement = a;
+            catmap = a;
         }
 
         public override string ToString()
         {
-            return string.Format("{0}/{1}", cubeset, arrangement);
+            return string.Format("cubeset={0}/catmap={1}", cubeset, catmap);
         }
     }
 }

@@ -9,8 +9,8 @@ public class CubeArrangements
 {
     // Cubesets == our set of counterbalancing conditions
     // first list is organized by possible groups of cubes
-    // second list is a set of cat -> cube mapping arrangements
-    // third list is a single arrangement
+    // second list is a set of cat -> cube mapping Catmaps
+    // third list is a single Catmap
     // fourth list is the data needed to make one cube
     // ColorShapeRotation describes the properties of one axis (l/r, t/b, f/b)
     // data may be somewhat massaged to make it easier to work with in matlab
@@ -19,12 +19,12 @@ public class CubeArrangements
     // [[[[{"cat":"c0","color":"r","rotation":0,"shape":"O"},{"cat":"c0","color":"b","rotation":120,"shape":"A"},{"cat":"c0","color":"g","rotation":240,"shape":"@"}], ...
     private List<List<List<List<ColorShapeRotation>>>> Cubesets { get; set; }
 
-    // the arrangements string comes from a JSON data file 
-    // see experiments.config.txt arrangements key or DataFarmer for where this is
+    // the Catmaps string comes from a JSON data file 
+    // see experiments.config.txt Catmaps key or DataFarmer for where this is
     // the file is derived from an external web application
-    public CubeArrangements(string arrangements)
+    public CubeArrangements(string Catmaps)
     {
-        Cubesets = JsonConvert.DeserializeObject<List<List<List<List<ColorShapeRotation>>>>>(arrangements);
+        Cubesets = JsonConvert.DeserializeObject<List<List<List<List<ColorShapeRotation>>>>>(Catmaps);
         foreach (List<List<List<ColorShapeRotation>>> arr in Cubesets)
         {
             Debug.Log(string.Format("we have {0} options", arr.Count));
@@ -36,7 +36,7 @@ public class CubeArrangements
         return (Cubesets.Count == 0);
     }
 
-    public int CountArrangements(int cubeset)
+    public int CountCatmaps(int cubeset)
     {
         return Cubesets[cubeset].Count;
     }
@@ -47,15 +47,15 @@ public class CubeArrangements
         return Cubesets.Count;
     }
 
-    public int CountCubes(int cubeset, int arrangement)
+    public int CountCubes(int cubeset, int catmap)
     {
         if (IsEmpty()) return 0;
-        return Cubesets[cubeset][arrangement].Count;
+        return Cubesets[cubeset][catmap].Count;
     }
 
     public List<CubeTuple> Shuffle(ParticipantStatus.Condition condition)
     {
-        List<List<ColorShapeRotation>> arr = Cubesets[condition.cubeset][condition.arrangement];
+        List<List<ColorShapeRotation>> arr = Cubesets[condition.cubeset][condition.catmap];
         CubeTuple[] shuffled = new CubeTuple[arr.Count];
         int i = 0;
         foreach (var c in arr)
