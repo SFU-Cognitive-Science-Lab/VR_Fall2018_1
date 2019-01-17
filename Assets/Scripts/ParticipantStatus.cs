@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 // here we save everything that relates to the participant during a test run
@@ -77,6 +78,37 @@ public class ParticipantStatus
             Debug.Log(string.Format("error setting participant {0}: {1}: {2}", part, e, e.Message));
         }
         return this;
+    }
+    // if we have a participant saved in a file get them
+    // if we can't parse the condition we use the participant 
+    // note that exceptions don't stop the game running
+    public void GetParticipantFromFile()
+    {
+        string partTuple = GetDataFarmer().GetPreviousParticipant();
+        if (partTuple != null)
+        {
+            Regex rx = new Regex(@"part=(\d+)/(.*)", RegexOptions.IgnoreCase);
+            MatchCollection matches = rx.Matches(partTuple);
+            GroupCollection groups = matches[0].Groups;
+            SetParticipant(groups[1].Value);
+            condition = new Condition(groups[2].Value);
+            if (condition.catmap == -1)
+            {
+                ConditionFromParticipant();
+            }
+        }
+    }
+
+    public void SaveParticipantCondition()
+    {
+        if (participant > 0)
+        {
+            if (condition != null)
+            {
+                GetDataFarmer().SaveParticipant(string.Format("part={0}/{1}", 
+                    participant, condition.ToString()));
+            }
+        }
     }
 
     // used in the UI where the participant id can be changed
@@ -269,6 +301,26 @@ public class ParticipantStatus
         {
             cubeset = c;
             catmap = a;
+        }
+
+        public Condition(string condStr)
+        {
+            try
+            {
+                Regex rx = new Regex(@"cubeset=(\d+)/catmap=(\d+)", RegexOptions.IgnoreCase);
+                MatchCollection matches = rx.Matches(condStr);
+                GroupCollection groups = matches[0].Groups;
+                cubeset = int.Parse(groups[1].Value);
+                Debug.Log("cubeset now " + cubeset);
+                catmap = int.Parse(groups[2].Value);
+                Debug.Log("catmap now " + catmap);
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e);
+                cubeset = -1;
+                catmap = -1;
+            }
         }
 
         public override string ToString()

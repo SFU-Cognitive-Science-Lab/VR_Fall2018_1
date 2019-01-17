@@ -18,11 +18,6 @@ public class ButtonDoStuff : MonoBehaviour {
     // we don't want the participant to see the UI
     void Start () {
         apply.onClick.AddListener(SetParticipantCondition);
-        participantID.text = ps.GetParticipantAsString();
-        ps.ConditionFromParticipant();
-        ParticipantStatus.Condition cond = ps.GetCondition();
-        cubeset.text = cond.cubeset.ToString();
-        arrangement.text = cond.catmap.ToString();
     }
 
     // in order for this to work we need an EventSystem component 
@@ -32,6 +27,7 @@ public class ButtonDoStuff : MonoBehaviour {
         if (ps.GetParticipant() > 0)
         {
             ps.SetCondition(int.Parse(cubeset.text), int.Parse(arrangement.text));
+            ps.SaveParticipantCondition();
             Debug.Log("condition " + ps.GetCondition() + " for " + ps.GetParticipant());
             SceneManager.LoadScene("MainScene", LoadSceneMode.Single);
         }

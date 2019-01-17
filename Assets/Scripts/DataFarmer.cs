@@ -38,6 +38,8 @@ public class DataFarmer {
     private static string ARRANGEMENTS_FILE; // where to store maps of categories to cubes
     private static string ARRANGEMENT_DIMS = "3x2"; // type of stimuli to get
     private static readonly string DEFAULT_LOG = "df.csv";
+    private static readonly string DEFAULT_PART_LOG = "participant.txt";
+    private static string PART_LOG = DefaultPartLog();
     private static string LOCAL_LOG = DefaultLog();
 
     // Cubesets of cubes for counterbalancing stimuli
@@ -74,7 +76,17 @@ public class DataFarmer {
 
     private static string DefaultLog()
     {
-        return string.Format(@"{0}\{1}", GetDesktop(), DEFAULT_LOG);
+        return DesktopPath(DEFAULT_LOG);
+    }
+
+    private static string DesktopPath(string fname)
+    {
+        return string.Format(@"{0}\{1}", GetDesktop(), fname);
+    }
+
+    private static string DefaultPartLog()
+    {
+        return DesktopPath(DEFAULT_PART_LOG);
     }
 
     // use saved configuration data to set up external connection
@@ -111,6 +123,7 @@ public class DataFarmer {
                     case "url": case "uri": REMOTE_URI = value; break;
                     case "secret": case "password": REMOTE_SECRET = value; break;
                     case "log": LOCAL_LOG = value; break;
+                    case "partlog": PART_LOG = value; break;
                     case "buffer": BUFFER_FULL = int.Parse(value); break;
                     case "arrangements": ARRANGEMENTS_FILE = value; break;
                     case "dims":
@@ -170,6 +183,27 @@ public class DataFarmer {
         }
         File.WriteAllText(ARRANGEMENTS_FILE, arrangements);
         return true;
+    }
+
+    // in some cases we'll want to remember the last participant
+    // mainly if we need to restart the experiment
+    // ParticipantStatus uses this information to rebuild the participant
+    public void SaveParticipant(string partTuple)
+    {
+        using (StreamWriter writer = File.CreateText(PART_LOG))
+        {
+            writer.WriteLine(partTuple);
+        }
+    }
+
+    public string GetPreviousParticipant()
+    {
+        string partTuple = null;
+        using (StreamReader reader = File.OpenText(PART_LOG))
+        {
+            partTuple = reader.ReadToEnd();
+        }
+        return partTuple;
     }
 
     // make a participant id if we don't have one already
