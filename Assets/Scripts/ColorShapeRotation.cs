@@ -14,17 +14,17 @@ public class ColorShapeRotation
     // materials are stored in the game in an array 
     // so here we simply return the index into the array
     public static readonly Dictionary<string, int> matmap = new Dictionary<string, int> {
-            { "V", 1 }, // upside down triangle
-            { "A", 2 }, // right way up triangle
-            { "@", 3 }, // vortex shape
-            { "=", 4 }, // parallel lines shape
-            { "D", 5 }, // diamonds pattern
-            { "O", 6 }, // omega symbol
+            { "D", 1 }, // red diamonds pattern
+            { "O", 2 }, // red omega symbol
+            { "@", 3 }, // green vortex shape
+            { "=", 4 }, // green parallel lines shape
+            { "V", 5 }, // blue triangle with line
+            { "A", 6 }, // blue triangle with cross
         };
 
     public int[] GetFaces()
     {
-        switch(rotation)
+        switch (rotation)
         {
             case 0: return new int[] { 5, 6 }; // up - down
             case 120: return new int[] { 1, 3 }; // left - right 
@@ -36,5 +36,10 @@ public class ColorShapeRotation
     public int GetMaterial()
     {
         return matmap[shape];
+    }
+
+    public override string ToString()
+    {
+        return string.Format("{0} {1}, ",color,shape);
     }
 }

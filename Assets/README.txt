@@ -76,6 +76,8 @@ facing the far wall before doing this.
 
 Both manual VR controllers must be available to run the experiment.
 Make sure they are sufficiently charged before running participants.
+You may encounter a bug where only one controller will show up in-game.
+Closing Unity and rebooting SteamVR should fix this error.
 
 We have two headsets and 4 hand controllers.
 
