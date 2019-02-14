@@ -8,7 +8,8 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using UnityEngine;
 
-public class DataFarmer {
+public class DataFarmer 
+{
 
     // 
     private static DataFarmer me = null;
@@ -18,7 +19,7 @@ public class DataFarmer {
 
     // SET BUFFER THRESHHOLD WHICH, WHEN MET, WILL STREAM DATA CHUNKS OUTWARD
     // this can be overridden from the config file
-    private static int BUFFER_FULL = 10;
+    private static int BUFFER_FULL = 1;
     private static int SAVE_RETRIES = 5;
 
     // Webclient needed to save data externally
@@ -36,23 +37,23 @@ public class DataFarmer {
     private static string REMOTE_URI;
     private static string REMOTE_SECRET;
     private static string ARRANGEMENTS_FILE; // where to store maps of categories to cubes
+    private static long FIRSTPARTICIPANT = -1;
     private static string ARRANGEMENT_DIMS = "3x2"; // type of stimuli to get
     private static readonly string DEFAULT_LOG = "df.csv";
-    private static readonly string DEFAULT_PART_LOG = "participant.txt";
-    private static string PART_LOG = DefaultPartLog();
     private static string LOCAL_LOG = DefaultLog();
 
     // Cubesets of cubes for counterbalancing stimuli
     public CubeArrangements CubeLists;
 
     // Use this for initialization - Creates a "virtual" game object.
-    public static DataFarmer GetInstance () {
-		if (me == null)
+    public static DataFarmer GetInstance()
+    {
+        if (me == null)
         {
             me = new DataFarmer();
         }
         return me;
-	}
+    }
 
     // this particular instantiation assumes we are logging to an 
     // external server that is coordinating participant ids
@@ -62,7 +63,7 @@ public class DataFarmer {
     }
 
     // logs in to external server and creates our identity for this run ...
-	public void Setup()
+    public void Setup()
     {
         GetConfig();
         Login();
@@ -76,17 +77,7 @@ public class DataFarmer {
 
     private static string DefaultLog()
     {
-        return DesktopPath(DEFAULT_LOG);
-    }
-
-    private static string DesktopPath(string fname)
-    {
-        return string.Format(@"{0}\{1}", GetDesktop(), fname);
-    }
-
-    private static string DefaultPartLog()
-    {
-        return DesktopPath(DEFAULT_PART_LOG);
+        return string.Format(@"{0}\{1}", GetDesktop(), DEFAULT_LOG);
     }
 
     // use saved configuration data to set up external connection
@@ -123,9 +114,17 @@ public class DataFarmer {
                     case "url": case "uri": REMOTE_URI = value; break;
                     case "secret": case "password": REMOTE_SECRET = value; break;
                     case "log": LOCAL_LOG = value; break;
-                    case "partlog": PART_LOG = value; break;
                     case "buffer": BUFFER_FULL = int.Parse(value); break;
                     case "arrangements": ARRANGEMENTS_FILE = value; break;
+                    case "firstparticipant":
+                        try
+                        {
+                            long.TryParse(value, out FIRSTPARTICIPANT);
+                        } catch (Exception e)
+                        {
+                            FIRSTPARTICIPANT = -1;
+                        }
+                        break;
                     case "dims":
                         if (dimsPat.IsMatch(value)) { ARRANGEMENT_DIMS = value; }
                         else throw new FormatException("dims should be NxM");
@@ -185,38 +184,36 @@ public class DataFarmer {
         return true;
     }
 
-    // in some cases we'll want to remember the last participant
-    // mainly if we need to restart the experiment
-    // ParticipantStatus uses this information to rebuild the participant
-    public void SaveParticipant(string partTuple)
-    {
-        using (StreamWriter writer = File.CreateText(PART_LOG))
-        {
-            writer.WriteLine(partTuple);
-        }
-    }
-
-    public string GetPreviousParticipant()
-    {
-        string partTuple = null;
-        using (StreamReader reader = File.OpenText(PART_LOG))
-        {
-            partTuple = reader.ReadToEnd();
-        }
-        return partTuple;
-    }
-
     // make a participant id if we don't have one already
     public string NewParticipant()
     {
-        if (loggedin) 
+        if (loggedin)
             return GetRequest(string.Format("{0}/new", REMOTE_URI));
         return NOT_LOGGED_IN;
     }
 
+    // what is the base participant id?
+    public long FirstParticipant()
+    {
+        if (FIRSTPARTICIPANT <= 0)
+        {
+            string firstie = GetRequest(string.Format("{0}/first", REMOTE_URI));
+            try
+            {
+                long.TryParse(firstie, out FIRSTPARTICIPANT);
+            }
+            catch (Exception e)
+            {
+                throw new InvalidCastException("can't get FIRSTPARTICIPANT - add a firstparticipant option in the config file?");
+            }
+        }
+        return FIRSTPARTICIPANT;
+    }
+
     // Saving the Data Chunk to File and remotely
     // on error does a lot of complaining and will throw an exception if no data can be saved
-    public void Save (DataFarmerObject thingToSave) {
+    public void Save(DataFarmerObject thingToSave)
+    {
 
         // Since this section is called every frame, the data.add line will continue 
         // to receive a new line of data on every iteration until the BUFFER is reached
@@ -262,7 +259,7 @@ public class DataFarmer {
                 throw new Exception("no data can be saved");
             }
         }
-	}
+    }
 
     // send remote data if we can
     private bool SaveRemotely(string dataString)

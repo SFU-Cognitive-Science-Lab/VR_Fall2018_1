@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Text.RegularExpressions;
 using UnityEngine;
 
 // here we save everything that relates to the participant during a test run
@@ -79,37 +78,6 @@ public class ParticipantStatus
         }
         return this;
     }
-    // if we have a participant saved in a file get them
-    // if we can't parse the condition we use the participant 
-    // note that exceptions don't stop the game running
-    public void GetParticipantFromFile()
-    {
-        string partTuple = GetDataFarmer().GetPreviousParticipant();
-        if (partTuple != null)
-        {
-            Regex rx = new Regex(@"part=(\d+)/(.*)", RegexOptions.IgnoreCase);
-            MatchCollection matches = rx.Matches(partTuple);
-            GroupCollection groups = matches[0].Groups;
-            SetParticipant(groups[1].Value);
-            condition = new Condition(groups[2].Value);
-            if (condition.catmap == -1)
-            {
-                ConditionFromParticipant();
-            }
-        }
-    }
-
-    public void SaveParticipantCondition()
-    {
-        if (participant > 0)
-        {
-            if (condition != null)
-            {
-                GetDataFarmer().SaveParticipant(string.Format("part={0}/{1}", 
-                    participant, condition.ToString()));
-            }
-        }
-    }
 
     // used in the UI where the participant id can be changed
     public string GetParticipantAsString()
@@ -136,9 +104,11 @@ public class ParticipantStatus
 
     public long IncTrial()
     {
-        if (ChoiceMade())
+        if (Cubes == null || ChoiceMade())
         {
+            GetNextStimulus();
             this.trial++;
+            GetDataFarmer().Save(new DFAnswerSelection(DFAnswerSelection.START));
         }
         return this.trial;
     }
@@ -236,6 +206,12 @@ public class ParticipantStatus
         return this;
     }
 
+    public ParticipantStatus BuildParticipantFromCondition()
+    {
+        this.participant = GetDataFarmer().FirstParticipant() + this.condition.cubeset * 100 + this.condition.catmap;
+        return this;
+    }
+
     // Convenience methods for getting descriptions of cubes:
     // a run is a series of trials that iterate through a list of cubes
     // when we get the end of a list we generate another 
@@ -250,8 +226,14 @@ public class ParticipantStatus
             Cube = 0;
         }
         this.trialStart = true;
-        IncTrial();
-        GetDataFarmer().Save(new DFAnswerSelection(DFAnswerSelection.START));
+        Debug.Log(string.Format("Next stimulus: {0}", Cubes[Cube]));
+        return Cubes[Cube];
+    }
+
+    public CubeTuple GetCube()
+    {
+        if (Cube < 0) return null;
+        if (Cubes == null) return null;
         return Cubes[Cube];
     }
 
@@ -285,42 +267,23 @@ public class ParticipantStatus
     // See ChoiceBehavior.cs for examples of how this is used
     public string GetCategory()
     {
-        if (Cube < 0) return "";
         if (Cubes == null) return "";
+        if (Cube < 0) return "";
         return Cubes[Cube].GetCategory();
     }
 
     // the condition for this experiment is the set of cubes
     // each participant should be evenly dispersed between the different 
     // possible mappings of the cubes to categories
-    public class Condition {
-        public int cubeset { get; set;  } // there are only a small number of ways to generate groups of distinct cubes
-        public int catmap { get; set;  } // out of these we should select one mapping of cubes to categories
+    public class Condition
+    {
+        public int cubeset { get; set; } // there are only a small number of ways to generate groups of distinct cubes
+        public int catmap { get; set; } // out of these we should select one mapping of cubes to categories
 
         public Condition(int c, int a)
         {
             cubeset = c;
             catmap = a;
-        }
-
-        public Condition(string condStr)
-        {
-            try
-            {
-                Regex rx = new Regex(@"cubeset=(\d+)/catmap=(\d+)", RegexOptions.IgnoreCase);
-                MatchCollection matches = rx.Matches(condStr);
-                GroupCollection groups = matches[0].Groups;
-                cubeset = int.Parse(groups[1].Value);
-                Debug.Log("cubeset now " + cubeset);
-                catmap = int.Parse(groups[2].Value);
-                Debug.Log("catmap now " + catmap);
-            }
-            catch (Exception e)
-            {
-                Debug.Log(e);
-                cubeset = -1;
-                catmap = -1;
-            }
         }
 
         public override string ToString()
