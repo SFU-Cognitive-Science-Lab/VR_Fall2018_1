@@ -41,7 +41,7 @@ public class applicator : MonoBehaviour {
     Material[] createSet()
     {
         // a CubeTuple is the 3 axes of the cube
-        CubeTuple c = ParticipantStatus.GetInstance().GetNextStimulus();
+        CubeTuple c = ParticipantStatus.GetInstance().GetCube();
         Material[] matlist = rend.materials;
 
         // this is the basic background material for the cube

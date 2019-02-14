@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 
+// DO NOT USE - entering everything manually now
 public class GetPreviousParticipant : MonoBehaviour {
     public Button button;
     public InputField participantID;
@@ -19,7 +20,6 @@ public class GetPreviousParticipant : MonoBehaviour {
 
 	void PreviousParticipantListener ()
     {
-        ps.GetParticipantFromFile();
         if (ps.GetParticipant() > 0)
         {
             participantID.text = ps.GetParticipantAsString();

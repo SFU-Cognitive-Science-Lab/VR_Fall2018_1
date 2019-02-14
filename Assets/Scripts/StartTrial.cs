@@ -5,12 +5,17 @@ using UnityEngine;
 public class StartTrial : MonoBehaviour {
     private ParticipantStatus ps = ParticipantStatus.GetInstance();
 
-	public void OnTriggerExit(Collider other)
+    public void Start()
+    {
+        ps.IncTrial();
+    }
+
+    public void OnTriggerEnter(Collider other)
     {
         // check if the participant made an answer then move on to next trial
-        // all this is now happening in ParticipantStatus.GetNextStimulus
         if (ps.ChoiceMade())
         {
+            ps.IncTrial();
             Debug.Log(string.Format("Starting trial {0} at {1}", ps.GetTrial(), Time.time));
         }
     }

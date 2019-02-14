@@ -23,11 +23,9 @@ public class ButtonDoStuff : MonoBehaviour {
     // in order for this to work we need an EventSystem component 
     void SetParticipantCondition()
     {
-        ps.SetParticipant(participantID.text);
+        ps.SetCondition(int.Parse(cubeset.text), int.Parse(arrangement.text)).BuildParticipantFromCondition();
         if (ps.GetParticipant() > 0)
         {
-            ps.SetCondition(int.Parse(cubeset.text), int.Parse(arrangement.text));
-            ps.SaveParticipantCondition();
             Debug.Log("condition " + ps.GetCondition() + " for " + ps.GetParticipant());
             SceneManager.LoadScene("MainScene", LoadSceneMode.Single);
         }
