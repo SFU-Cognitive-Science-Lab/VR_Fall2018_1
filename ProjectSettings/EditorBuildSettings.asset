@@ -9,6 +9,12 @@ EditorBuildSettings:
     path: Assets/SetParticipantCondition.unity
     guid: 072315484c46a464188a6f6085884998
   - enabled: 1
+    path: Assets/TestScene.unity
+    guid: 646e12e2b7b49c34ba8f621f9fca231c
+  - enabled: 1
+    path: Assets/ParticipantInstructions.unity
+    guid: 2a9e995c1e65dba429dcdb8e43cec337
+  - enabled: 1
     path: Assets/MainScene.unity
     guid: 929df9602ffaaf142b2fe81722835fd9
   m_configObjects: {}

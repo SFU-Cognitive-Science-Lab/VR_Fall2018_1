@@ -91,13 +91,14 @@ public class DespawnObject : MonoBehaviour {
 * Attached to next button in unity editor. Triggers On Hand Hover Begin()
 */
 
-    public void buttonDespawn()
+    public void buttonDespawn(bool any = false)
     {
         GameObject[] currentObjs = GameObject.FindGameObjectsWithTag("Interactable Object");
-
+        Debug.Log("found " + currentObjs.Length + " cubes to despawn");
         foreach (GameObject cube in currentObjs)
         {
-            if (cube.GetComponent<CustomTag>().getTag(1) != "") { 
+            Debug.Log("custom tag is " + cube.GetComponent<CustomTag>().getTag(1));
+            if (any || cube.GetComponent<CustomTag>().getTag(1) != "") { 
                 Debug.Log("Destroyed " + cube);
                 Destroy(cube);
             }
