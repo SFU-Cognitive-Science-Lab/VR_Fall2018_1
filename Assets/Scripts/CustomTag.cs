@@ -49,7 +49,7 @@ public class CustomTag : MonoBehaviour
             if (tags[0] == button)
             {
                 tags[1] = "CORRECT";
-                //Debug.Log("CORECT");
+                //Debug.Log("CORRECT");
             }
             else
             {

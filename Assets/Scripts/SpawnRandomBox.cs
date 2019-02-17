@@ -38,21 +38,28 @@ public class SpawnRandomBox : MonoBehaviour {
         }
     }
 
-    public void spawn()
+    public void spawn(bool always = false)
     {
         // this determines if anything is already on display
         // without it you get a "ball" of superimposed boxes which is quite mesmerizing ...
         int objects = 0;
-        GameObject[] currentObjs = GameObject.FindGameObjectsWithTag("Interactable Object");
 
-        foreach (GameObject cube in currentObjs)
+        if (always)
         {
-            if (cube.GetComponent<CustomTag>().getTag(1) == "")
+            Debug.Log("always spawning");
+        }
+        else
+        {
+            GameObject[] currentObjs = GameObject.FindGameObjectsWithTag("Interactable Object");
+            foreach (GameObject cube in currentObjs)
             {
-                objects += 1;
+                if (cube.GetComponent<CustomTag>().getTag(1) == "")
+                {
+                    objects += 1;
+                }
             }
         }
-        if (boxPrefab != null && objects == 0)
+        if (boxPrefab != null && (objects == 0 || always))
         {
             Transform randomBox = Instantiate(boxPrefab);
             randomBox.position = spawnPoint.position;

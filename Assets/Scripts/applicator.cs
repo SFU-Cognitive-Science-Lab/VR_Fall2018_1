@@ -2,16 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-//TODO: tidy things up into a nice function
-// see createSet() below with no arguments, if it worked it might be a candidate
-
 public class applicator : MonoBehaviour {
     public Material[] material;
     Renderer rend;
 
     void Start()
     {
-        Cubes cubes = new Cubes();
         Debug.Log("new dress!");
         rend = GetComponent<Renderer>();
         rend.enabled = true;
@@ -33,8 +29,7 @@ public class applicator : MonoBehaviour {
     // as json data
     // for any participant we pick one set of mappings 
     // and go through them somewhat randomly
-
-    // I guess this is the current version of the "nice function"
+    
     // this pulls the materials based on what we get for
     // the externally generated counterbalancing conditions
     // and maps the materials to the raw cube
