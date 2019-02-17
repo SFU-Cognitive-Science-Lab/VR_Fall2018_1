@@ -94,10 +94,8 @@ public class DespawnObject : MonoBehaviour {
     public void buttonDespawn(bool any = false)
     {
         GameObject[] currentObjs = GameObject.FindGameObjectsWithTag("Interactable Object");
-        Debug.Log("found " + currentObjs.Length + " cubes to despawn");
         foreach (GameObject cube in currentObjs)
         {
-            Debug.Log("custom tag is " + cube.GetComponent<CustomTag>().getTag(1));
             if (any || cube.GetComponent<CustomTag>().getTag(1) != "") { 
                 Debug.Log("Destroyed " + cube);
                 Destroy(cube);

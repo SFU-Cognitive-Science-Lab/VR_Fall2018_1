@@ -26,4 +26,14 @@ public class CubeTuple
     {
         return catmap[cube[0].cat];
     }
+
+    public override string ToString()
+    {
+        string cubeStr = "cube:";
+        foreach (ColorShapeRotation csr in cube)
+        {
+            cubeStr = string.Concat(cubeStr, string.Format("/{0}{1}",csr.color,csr.shape));
+        }
+        return cubeStr;
+    }
 }
