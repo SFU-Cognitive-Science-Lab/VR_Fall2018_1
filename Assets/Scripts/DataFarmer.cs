@@ -212,14 +212,14 @@ public class DataFarmer
 
     // Saving the Data Chunk to File and remotely
     // on error does a lot of complaining and will throw an exception if no data can be saved
-    public void Save(DataFarmerObject thingToSave)
+    public void Save(DataFarmerObject thingToSave, bool saveme=false)
     {
 
         // Since this section is called every frame, the data.add line will continue 
         // to receive a new line of data on every iteration until the BUFFER is reached
         data.Add(thingToSave);
 
-        if (data.Count == BUFFER_FULL)
+        if (saveme || data.Count == BUFFER_FULL)
         {
             bool anythingsaved = false;
             // Serialize data structure

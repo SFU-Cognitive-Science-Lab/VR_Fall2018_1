@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class StartExperiment : MonoBehaviour {
-
+    public string NextScene;
     public Button apply;
     private ParticipantStatus ps = ParticipantStatus.GetInstance();
 
@@ -24,7 +24,10 @@ public class StartExperiment : MonoBehaviour {
         if (ps.GetParticipant() > 0)
         {
             Debug.Log("Starting experiment: condition " + ps.GetCondition() + " for " + ps.GetParticipant());
-            SceneManager.LoadScene("MainScene", LoadSceneMode.Single);
+            if (NextScene != null && NextScene != "")
+            {
+                SceneManager.LoadScene(NextScene, LoadSceneMode.Single);
+            } 
         }
     }
 
