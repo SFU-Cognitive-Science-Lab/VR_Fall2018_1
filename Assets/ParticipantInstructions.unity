@@ -308,7 +308,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Click to start
+  m_Text: Show Condition
 --- !u!222 &525495338
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -765,7 +765,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 262b907447e810d40815056a23af8884, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  NextScene: 
   apply: {fileID: 742168811}
+--- !u!114 &1851744246
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1851744243}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 03fb16e93da6aaf47a90a501bec98cbc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Seconds: 20
+  NextScene: MainScene
 --- !u!114 &1851744248
 MonoBehaviour:
   m_ObjectHideFlags: 0

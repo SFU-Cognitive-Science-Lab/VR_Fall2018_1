@@ -27,7 +27,6 @@ public class ButtonDoStuff : MonoBehaviour {
         if (ps.GetParticipant() > 0)
         {
             Debug.Log("condition " + ps.GetCondition() + " for " + ps.GetParticipant());
-            SceneManager.LoadScene("TestScene", LoadSceneMode.Single);
         }
     }
 
