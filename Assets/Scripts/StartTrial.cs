@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class StartTrial : MonoBehaviour {
     public Valve.VR.InteractionSystem.Hand leftController;
@@ -11,6 +12,7 @@ public class StartTrial : MonoBehaviour {
     {
         ps.IncTrial();
     }
+
     public void OnTriggerStay(Collider other)
     {
         if (leftController.controller.GetHairTriggerDown() || rightController.controller.GetHairTriggerDown())
@@ -19,6 +21,10 @@ public class StartTrial : MonoBehaviour {
             if (ps.ChoiceMade())
             {
                 ps.IncTrial();
+                if (ps.IsFinished())
+                {
+                    SceneManager.LoadScene("FinalScene", LoadSceneMode.Single);
+                }
                 Debug.Log(string.Format("Starting trial {0} at {1}", ps.GetTrial(), Time.time));
             }
         }

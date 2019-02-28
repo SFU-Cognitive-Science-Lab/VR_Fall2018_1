@@ -1324,17 +1324,12 @@ TextMesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1654088004}
-  m_Text: 'In this experiment you will learn how to categorize
-
-    a series of cubes.
-
-
-    On the following screen click you can practice manipulating a cube.
-
-    You will see an arrow. Click on that arrow to view a cube.
-
-
-'
+  m_Text: "In this experiment you will learn how to categorize\na series of cubes.\n\nOn
+    the following screen, you can practice \nmanipulating a cube and interacting with
+    the buttons.\n\nAn arrow will appear at the top center of the test area.\nClicking
+    the arrow will summon a cube up to ten times.\nAfter the tenth cube, we will move
+    on to the main trials.\n\nIf at any time you experience discomfort, please notify
+    the researcher."
   m_OffsetZ: 0
   m_CharacterSize: 0.15
   m_LineSpacing: 1
@@ -2015,6 +2010,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 99fe965f93f3157408ff2619d1f23e3d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  NextScene: TestScene
   apply: {fileID: 742168811}
   participantID: {fileID: 1756225848}
   cubeset: {fileID: 264375293}
@@ -2025,7 +2021,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1851744243}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 03fb16e93da6aaf47a90a501bec98cbc, type: 3}
   m_Name: 

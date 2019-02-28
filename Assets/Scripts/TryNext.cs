@@ -6,6 +6,8 @@ using UnityEngine.SceneManagement;
 public class TryNext : MonoBehaviour {
     public Valve.VR.InteractionSystem.Hand leftController;
     public Valve.VR.InteractionSystem.Hand rightController;
+    public GameObject [] TestButtons;
+    public Material material;
 
     public int trials;
     private ParticipantStatus ps;
@@ -20,6 +22,15 @@ public class TryNext : MonoBehaviour {
     {
         if (leftController.controller.GetHairTriggerDown() || rightController.controller.GetHairTriggerDown())
         {
+            //reset selection state
+            TestState.SetSelectedFalse();
+
+            //reset all buttons back to grey (no choice)
+            for(int i = 0; i < 4; i++)
+            {
+                TestButtons[i].GetComponent<Renderer>().material = material;
+            }
+
             if (trials > 0)
             {
                 //Despawn current box
