@@ -452,13 +452,14 @@ TextMesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1654088004}
-  m_Text: "On the following screen, click on the arrow to start.\n\nA cube will appear.
-    \nExamine the cube using the controllers and select a category A B C D.\n\nIf
-    you have selected the correct response, it will light up in green.\nIf you have
-    selected the wrong response, your response will light up in red,\nand the correct
-    response will light up in green.\n\nYou can take as long as you need to make a
-    choice. \nHowever, you may make only one choice. \nTo continue after chosing a
-    category, click the arrow again.\n\nThe experiment will begin shortly."
+  m_Text: 'The experiment is now concluded.
+
+    Thank you very much for participating in our study!
+
+    If you have any questions regarding the experiment please contact Mark Blair (mblair@sfu.ca)
+
+
+    You may now safely remove the VR headset and controllers.'
   m_OffsetZ: 0
   m_CharacterSize: 0.15
   m_LineSpacing: 1

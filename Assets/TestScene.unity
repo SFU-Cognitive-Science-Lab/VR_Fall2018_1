@@ -696,24 +696,7 @@ RectTransform:
   m_AnchoredPosition: {x: -0.017, y: -0.223}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!1 &685530987 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1580182137836874, guid: 67d321f49239a6544af420f5316aab85,
-    type: 2}
-  m_PrefabInternal: {fileID: 2092378684}
---- !u!114 &685530988
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 685530987}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c3f9c678163657c4490c04444e0f1aa6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  thing: RightHand
---- !u!21 &698654193
+--- !u!21 &660001941
 Material:
   serializedVersion: 6
   m_ObjectHideFlags: 0
@@ -746,6 +729,23 @@ Material:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _Flip: {r: 1, g: 1, b: 1, a: 1}
     - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
+--- !u!1 &685530987 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1580182137836874, guid: 67d321f49239a6544af420f5316aab85,
+    type: 2}
+  m_PrefabInternal: {fileID: 2092378684}
+--- !u!114 &685530988
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 685530987}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3f9c678163657c4490c04444e0f1aa6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  thing: RightHand
 --- !u!1 &754548296
 GameObject:
   m_ObjectHideFlags: 0
@@ -1025,7 +1025,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!43 &1396219277
+--- !u!43 &1394145325
 Mesh:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1042,7 +1042,7 @@ Mesh:
     vertexCount: 8
     localAABB:
       m_Center: {x: 0, y: 0.01, z: 0}
-      m_Extent: {x: 1.95, y: 0, z: 1.2000005}
+      m_Extent: {x: 0.70000005, y: 0, z: 0.7}
   m_Shapes:
     vertices: []
     shapes: []
@@ -1118,7 +1118,7 @@ Mesh:
       format: 0
       dimension: 0
     m_DataSize: 288
-    _typelessdata: 0000e03f0ad7233c040080bf7bbb463fa0a0203d0000803f0000000000000000000000000000e0bf0ad7233c040080bf7bbb463fa0a0203d0000803f000000000000803f000000000000e0bf0ad7233c0400803f7bbb463fa0a0203d0000803f0000000000000000000000000000e03f0ad7233c0400803f7bbb463fa0a0203d0000803f000000000000803f000000009a99f93f0ad7233c9e9999bf7bbb463fa0a0203d0000803f00000000000000000000803f9a99f9bf0ad7233c9e9999bf7bbb463fa0a0203d0000803f000000000000803f0000803f9a99f9bf0ad7233c9e99993f7bbb463fa0a0203d0000803f00000000000000000000803f9a99f93f0ad7233c9e99993f7bbb463fa0a0203d0000803f000000000000803f0000803f
+    _typelessdata: 0100003f0ad7233c000000bf7bbb463fa0a0203d0000803f000000000000000000000000010000bf0ad7233c000000bf7bbb463fa0a0203d0000803f000000000000803f00000000010000bf0ad7233c0000003f7bbb463fa0a0203d0000803f0000000000000000000000000100003f0ad7233c0000003f7bbb463fa0a0203d0000803f000000000000803f000000003433333f0ad7233c333333bf7bbb463fa0a0203d0000803f00000000000000000000803f343333bf0ad7233c333333bf7bbb463fa0a0203d0000803f000000000000803f0000803f343333bf0ad7233c3333333f7bbb463fa0a0203d0000803f00000000000000000000803f3433333f0ad7233c3333333f7bbb463fa0a0203d0000803f000000000000803f0000803f
   m_CompressedMesh:
     m_Vertices:
       m_NumItems: 0
@@ -1173,7 +1173,7 @@ Mesh:
     m_UVInfo: 0
   m_LocalAABB:
     m_Center: {x: 0, y: 0.01, z: 0}
-    m_Extent: {x: 1.95, y: 0, z: 1.2000005}
+    m_Extent: {x: 0.70000005, y: 0, z: 0.7}
   m_MeshUsageFlags: 0
   m_BakedConvexCollisionMesh: 
   m_BakedTriangleCollisionMesh: 
@@ -1653,7 +1653,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   leftController: {fileID: 2092378686}
   rightController: {fileID: 2092378685}
-  trials: 10
+  TestButtons:
+  - {fileID: 24365844}
+  - {fileID: 754548296}
+  - {fileID: 66038161}
+  - {fileID: 2067136964}
+  material: {fileID: 2100000, guid: 1f48e45588972ec45b826e54a25727b6, type: 2}
+  trials: 5
 --- !u!114 &2035094762
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1911,12 +1917,12 @@ Prefab:
         type: 2}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 698654193}
+      objectReference: {fileID: 660001941}
     - target: {fileID: 33741097998007530, guid: 67d321f49239a6544af420f5316aab85,
         type: 2}
       propertyPath: m_Mesh
       value: 
-      objectReference: {fileID: 1396219277}
+      objectReference: {fileID: 1394145325}
     - target: {fileID: 114171082203394236, guid: 67d321f49239a6544af420f5316aab85,
         type: 2}
       propertyPath: actualBoundaries

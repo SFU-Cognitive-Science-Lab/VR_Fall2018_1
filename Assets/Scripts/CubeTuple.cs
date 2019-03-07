@@ -30,9 +30,14 @@ public class CubeTuple
     public override string ToString()
     {
         string cubeStr = string.Format("cat: {0} cube:", GetCategory());
+        SortedDictionary<int, string> axes = new SortedDictionary<int, string>();
         foreach (ColorShapeRotation csr in cube)
         {
-            cubeStr = string.Concat(cubeStr, string.Format("/{0}{1}",csr.color,csr.shape));
+            axes.Add(csr.rotation, string.Format("/{0}{1}",csr.color,csr.shape));
+        }
+        foreach (string axis in axes.Values)
+        {
+            cubeStr = string.Concat(cubeStr, axis);
         }
         return cubeStr;
     }

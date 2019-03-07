@@ -18,9 +18,13 @@ public class ToggleColor : MonoBehaviour {
     {
         if (leftController.controller.GetHairTriggerDown() || rightController.controller.GetHairTriggerDown())
         {
-            currentMaterial++;
-            if (currentMaterial >= materials.Length) currentMaterial = 0;
-            gameObject.GetComponent<Renderer>().material = materials[currentMaterial];
+            if (!TestState.isSelected())
+            {
+                TestState.SetSelectedTrue();
+                currentMaterial = Random.Range(0, 1);
+                if (currentMaterial >= materials.Length) currentMaterial = 0;
+                gameObject.GetComponent<Renderer>().material = materials[currentMaterial];
+            }
         }
     }
 }

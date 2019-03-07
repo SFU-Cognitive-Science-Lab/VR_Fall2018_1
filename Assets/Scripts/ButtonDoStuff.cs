@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class ButtonDoStuff : MonoBehaviour {
-
+    public string NextScene;
     public Button apply;
     public InputField participantID;
     public InputField cubeset;
@@ -27,6 +27,7 @@ public class ButtonDoStuff : MonoBehaviour {
         if (ps.GetParticipant() > 0)
         {
             Debug.Log("condition " + ps.GetCondition() + " for " + ps.GetParticipant());
+            SceneManager.LoadScene(NextScene, LoadSceneMode.Single);
         }
     }
 
