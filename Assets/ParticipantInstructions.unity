@@ -391,7 +391,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 742168812}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 11500000, guid: fd7bbe2a01f96bb4f8e47be5223c397c, type: 3}
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &742168812
@@ -458,7 +469,10 @@ TextMesh:
     selected the wrong response, your response will light up in red,\nand the correct
     response will light up in green.\n\nYou can take as long as you need to make a
     choice. \nHowever, you may make only one choice. \nTo continue after chosing a
-    category, click the arrow again.\n\nThe experiment will begin shortly."
+    category, click the arrow again.\n\nAt first, you'll be guessing on which cube
+    belongs to which category,\nbut by looking at the feedback, you'll be able to
+    learn which features\n are associating with which categories.\n\nThe experiment
+    will begin shortly."
   m_OffsetZ: 0
   m_CharacterSize: 0.15
   m_LineSpacing: 1
@@ -775,13 +789,26 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1851744243}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 03fb16e93da6aaf47a90a501bec98cbc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Seconds: 20
   NextScene: MainScene
+--- !u!114 &1851744247
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1851744243}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd7bbe2a01f96bb4f8e47be5223c397c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  NextScene: MainScene
+  apply: {fileID: 742168811}
 --- !u!114 &1851744248
 MonoBehaviour:
   m_ObjectHideFlags: 0
