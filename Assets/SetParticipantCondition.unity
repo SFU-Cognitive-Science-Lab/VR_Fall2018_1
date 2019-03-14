@@ -1327,9 +1327,9 @@ TextMesh:
   m_Text: "In this experiment you will learn how to categorize\na series of cubes.\n\nOn
     the following screen, you can practice \nmanipulating a cube and interacting with
     the buttons.\n\nAn arrow will appear at the top center of the test area.\nClicking
-    the arrow will summon a cube up to ten times.\nAfter the tenth cube, we will move
-    on to the main trials.\n\nIf at any time you experience discomfort, please notify
-    the researcher."
+    the arrow will summon a cube up to five times.\nAfter the fifth cube, we will
+    move on to the main trials.\nFeel free to practice interacting with the cubes.
+    \n\nIf at any time you experience discomfort, please notify the researcher."
   m_OffsetZ: 0
   m_CharacterSize: 0.15
   m_LineSpacing: 1
