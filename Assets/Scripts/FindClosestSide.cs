@@ -5,24 +5,27 @@ using UnityEngine.UI;
 
 public class FindClosestSide : MonoBehaviour {
     GameObject player;
-    int RIGHT = 0, UP = 1, FORWARD = 2, NOSIDE = 3;
-    string[] dirStrings = { "right", "up", "forward", "no side" };
-    int previousSide;
+    public readonly int RIGHT = 0, UP = 1, FORWARD = 2, NOSIDE = 3, NULLSIDE = 4;
+    public readonly string[] dirStrings = { "right", "up", "forward", "no side", "NULL" };
+    public int previousSide;
     public int thresholdAngle = 56;
     public bool detailedLogging = false;
     public Text angleDisplay;
     public int measurements = 0;
     private ParticipantStatus ps = ParticipantStatus.GetInstance();
+    private long trial;
 
     // Use this for initialization
     void Start () {
         player = GameObject.FindGameObjectWithTag("MainCamera"); // this responds to head movements, Player doesn't
         Debug.Log("Player", player);
         previousSide = -1;
+        trial = -1;
     }
-	
-	// Update is called once per frame
-	void Update () {
+
+    // Update is called once per frame
+    public void Update()
+    {
         GameObject cube = GameObject.FindGameObjectWithTag("Interactable Object");
 
         if (player != null && cube != null)
@@ -44,10 +47,23 @@ public class FindClosestSide : MonoBehaviour {
                     visibleSide = angles.ToList().IndexOf(max);
                 }
 
-                if (ps.IsTrialStart() || (visibleSide != previousSide))
-                {
-                    if (ps.IsTrialStart()) ps.UnsetTrialStart();
+                bool publishUpdate = false;
 
+                if (ps.GetTrial() != trial)
+                {
+                    trial = ps.GetTrial();
+                    publishUpdate = true;
+                }
+                else
+                {
+                    if (visibleSide != previousSide)
+                    {
+                        publishUpdate = true;
+                    }
+                }
+
+                if (publishUpdate)
+                { 
                     // the last Vector3 is a placeholder for the cumulative movement of the head and hand controllers
                     DataFarmer.GetInstance().Save(
                         new DFFixation(
