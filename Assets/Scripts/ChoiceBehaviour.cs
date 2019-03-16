@@ -55,9 +55,9 @@ public class ChoiceBehaviour : MonoBehaviour {
     public void OnTriggerStay(Collider other)
     {
 
-        if (leftController.controller.GetPress(SteamVR_Controller.ButtonMask.Trigger) 
-            || rightController.controller.GetPress(SteamVR_Controller.ButtonMask.Trigger))
-        {
+        // if (leftController.controller.GetPress(SteamVR_Controller.ButtonMask.Trigger)             || rightController.controller.GetPress(SteamVR_Controller.ButtonMask.Trigger))
+        if (leftController.controller.GetHairTriggerUp() || rightController.controller.GetHairTriggerUp())
+            {
             if (cTag != "NEXT")
             {
                 if (firstChoice == true)

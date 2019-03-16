@@ -15,7 +15,7 @@ public class StartTrial : MonoBehaviour {
 
     public void OnTriggerStay(Collider other)
     {
-        if (leftController.controller.GetHairTriggerDown() || rightController.controller.GetHairTriggerDown())
+        if (leftController.controller.GetHairTriggerUp() || rightController.controller.GetHairTriggerUp())
         {
             // check if the participant made an answer then move on to next trial
             if (ps.ChoiceMade())
