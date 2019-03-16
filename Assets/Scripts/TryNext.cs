@@ -20,7 +20,7 @@ public class TryNext : MonoBehaviour {
 
     private void OnTriggerStay(Collider other)
     {
-        if (leftController.controller.GetHairTriggerDown() || rightController.controller.GetHairTriggerDown())
+        if (leftController.controller.GetHairTriggerUp() || rightController.controller.GetHairTriggerUp())
         {
             //reset selection state
             TestState.SetSelectedFalse();

@@ -11,6 +11,10 @@ public class ParticipantStatus
     public static readonly long NO_PARTICIPANT = -1;
     public static readonly int NO_ARRANGEMENT = -1;
 
+    // debug at least sets the condition to an arbitrary value
+    private Condition debugCondition = null;
+    // private Condition debugCondition = new Condition(5, 5);
+
     // Participant Subject ID initially garnered from the external host
     // can also be set from the UI when the run starts
     // not having this set to a sensible value is a show stopper
@@ -54,6 +58,11 @@ public class ParticipantStatus
     {
         answers = new SortedDictionary<long, string>();
         displacements = new Dictionary<string, KeyValuePair<float, float>>();
+        if (debugCondition != null)
+        {
+            Debug.Log("setting condition from debugCondition " + debugCondition);
+            SetCondition(debugCondition.cubeset, debugCondition.catmap).BuildParticipantFromCondition();
+        }
     }
 
     // this is mainly used when we get the answer during a trial to make code simpler

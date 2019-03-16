@@ -7,7 +7,7 @@ public class GetChoice : MonoBehaviour {
     private ParticipantStatus ps = ParticipantStatus.GetInstance();
 
     void OnTriggerStay(Collider other) {
-        if (leftController.controller.GetHairTriggerDown() || rightController.controller.GetHairTriggerDown())
+        if (leftController.controller.GetHairTriggerUp() || rightController.controller.GetHairTriggerUp())
         {
             if (ps.SetChoice(choice))
             {
