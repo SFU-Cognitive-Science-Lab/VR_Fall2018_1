@@ -471,7 +471,7 @@ TextMesh:
     choice. \nHowever, you may make only one choice. \nTo continue after chosing a
     category, click the arrow again.\n\nAt first, you'll be guessing on which cube
     belongs to which category,\nbut by looking at the feedback, you'll be able to
-    learn which features\n are associating with which categories.\n\nThe experiment
+    learn which features\n are associated with which categories.\n\nThe experiment
     will begin shortly."
   m_OffsetZ: 0
   m_CharacterSize: 0.15

@@ -16,7 +16,7 @@ public class ToggleColor : MonoBehaviour {
 
     void OnTriggerStay(Collider other)
     {
-        if (leftController.controller.GetHairTriggerDown() || rightController.controller.GetHairTriggerDown())
+        if (leftController.controller.GetHairTriggerUp() || rightController.controller.GetHairTriggerUp())
         {
             if (!TestState.isSelected())
             {
