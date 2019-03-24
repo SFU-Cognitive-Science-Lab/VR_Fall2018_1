@@ -283,12 +283,12 @@ public class DataFarmer
             if (ForceSave || data.Count >= BUFFER_FULL)
             {
                 // Serialize data structure
+                SaveMutex.WaitOne();
                 string dataString = "";
                 foreach (IDataFarmerObject o in data)
                 {
                     dataString += o.Serialize();
                 }
-                SaveMutex.WaitOne();
                 data.Clear();
                 SaveMutex.ReleaseMutex();
 
