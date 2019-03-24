@@ -8,18 +8,37 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using UnityEngine;
 
-public class DataFarmer 
+/**
+* Purpose of this class is to handle IO operations and 
+* basic application set up
+* It is designed to connect to an external experiments
+* manager via a url defined in a config file
+* (see GetConfig below)
+* In normal usage it can be used to collect data and
+* save it when a threshold has been reached
+* The data is stored as a list of objects the classes 
+* for which implement the IDataFarmerObject interface
+* This class also does other things such as load stimuli 
+* definitions for counterbalancing and implements
+* other wrappers of experiments manager web API calls.
+* TODO: possibly split up some functionality
+* TODO: make the interface more general 
+* (e.g. generalize the Cubes related methods)
+*/
+public class DataFarmer
 {
-
-    // 
+    // for each experiment run we only make one instance of this 
     private static DataFarmer me = null;
 
     // buffer for incoming data
     private List<IDataFarmerObject> data = new List<IDataFarmerObject>();
 
-    // SET BUFFER THRESHHOLD WHICH, WHEN MET, WILL STREAM DATA CHUNKS OUTWARD
+    // SET BUFFER THRESHOLD WHICH, WHEN MET, WILL STREAM DATA CHUNKS OUTWARD
     // this can be overridden from the config file
     private static int BUFFER_FULL = 10;
+    private bool ForceSave = false;
+    private Mutex SaveMutex = new Mutex();
+    private AutoResetEvent Wait = new AutoResetEvent(false);
     private static int SAVE_RETRIES = 5;
 
     // Webclient needed to save data externally
@@ -34,7 +53,7 @@ public class DataFarmer
 
     // for GetConfig below
     public static int TRIALS = -1; // if TRIALS is <= 0 go on forever
-    private static string CONFIG_FILE;
+    public static string CONFIG_FILE;
     private static string REMOTE_URI;
     private static string REMOTE_SECRET;
     private static string ARRANGEMENTS_FILE; // where to store maps of categories to cubes
@@ -69,9 +88,30 @@ public class DataFarmer
         GetConfig();
         Login();
         LoadCubes();
+        // Thanks to Thomas for thinking of this
+        // for situations where there are multiple experiments happening at
+        // the same time the lag from the http connection calls is affecting
+        // the performance of the rendering engine
+        // running the save operation in the background fixes this problem
+        // in this case we are using a single thread to save and when we 
+        // add items to the data list we signal to the SaveCallback to try and 
+        // save the items
+        Thread SaveThread = new Thread(new ThreadStart(SaveCallback));
+        try
+        {
+            SaveThread.Start();
+        }
+        catch (ThreadAbortException e)
+        {
+            Debug.LogError("DataFarmer SaveThread abort: " + e.Message);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("DataFarmer SaveThread exception: " + e.Message);
+        }
     }
 
-    private static string GetDesktop()
+    public static string GetDesktop()
     {
         return Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
     }
@@ -121,7 +161,8 @@ public class DataFarmer
                         try
                         {
                             int.TryParse(value, out TRIALS);
-                        } catch (Exception e)
+                        }
+                        catch (Exception e)
                         {
                             TRIALS = -1;
                         }
@@ -130,7 +171,8 @@ public class DataFarmer
                         try
                         {
                             long.TryParse(value, out FIRSTPARTICIPANT);
-                        } catch (Exception e)
+                        }
+                        catch (Exception e)
                         {
                             FIRSTPARTICIPANT = -1;
                         }
@@ -222,53 +264,65 @@ public class DataFarmer
 
     // Saving the Data Chunk to File and remotely
     // on error does a lot of complaining and will throw an exception if no data can be saved
-    public void Save(DataFarmerObject thingToSave, bool saveme=false)
+    public void Save(DataFarmerObject thingToSave, bool savenow = false)
     {
-
         // Since this section is called every frame, the data.add line will continue 
         // to receive a new line of data on every iteration until the BUFFER is reached
+        ForceSave = savenow;
+        SaveMutex.WaitOne();
         data.Add(thingToSave);
+        SaveMutex.ReleaseMutex();
+        Wait.Set();
+    }
 
-        if (saveme || data.Count == BUFFER_FULL)
+    private void SaveCallback()
+    {
+        while (true)
         {
-            bool anythingsaved = false;
-            // Serialize data structure
-            string dataString = "";
-            foreach (IDataFarmerObject o in data)
+            Wait.WaitOne();
+            if (ForceSave || data.Count >= BUFFER_FULL)
             {
-                dataString += o.Serialize();
-            }
-
-            // update csv log on file path
-            if (LOCAL_LOG != null)
-            {
-                try
+                // Serialize data structure
+                string dataString = "";
+                foreach (IDataFarmerObject o in data)
                 {
-                    Debug.Log("Data Moving to File!");
-                    using (StreamWriter file = File.AppendText(LOCAL_LOG))
-                    {
-                        file.Write(dataString);
-                        anythingsaved = true;
-                    }
+                    dataString += o.Serialize();
                 }
-                catch (Exception e)
+                SaveMutex.WaitOne();
+                data.Clear();
+                SaveMutex.ReleaseMutex();
+
+                bool retLoc = SaveLocally(dataString);
+                bool retRem = SaveRemotely(dataString);
+                if (!(retLoc || retRem))
                 {
-                    Debug.Log(string.Format("failed to write to log: {0} {1}", e, e.Message));
+                    Debug.Log("ERROR: NO DATA COULD BE SAVED!");
                 }
-            }
-
-            if (SaveRemotely(dataString))
-            {
-                anythingsaved = true;
-            }
-
-            data.Clear();
-            if (!anythingsaved)
-            {
-                Debug.Log("ERROR: NO DATA COULD BE SAVED!");
-                throw new Exception("no data can be saved");
+                ForceSave = false;
             }
         }
+    }
+    private bool SaveLocally(string dataString)
+    {
+        // update csv log on file path
+        if (LOCAL_LOG != null)
+        {
+            try
+            {
+                Debug.Log("Data Moving to File!");
+                using (StreamWriter file = File.AppendText(LOCAL_LOG))
+                {
+                    file.Write(dataString);
+                }
+                return true;
+            }
+            catch (Exception e)
+            {
+                Debug.Log(string.Format("failed to write to log: {0} {1}", e, e.Message));
+            }
+        }
+        return false;
+
     }
 
     // send remote data if we can
@@ -442,3 +496,4 @@ public class DataFarmer
         }
     }
 }
+
