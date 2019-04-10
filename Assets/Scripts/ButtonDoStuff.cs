@@ -10,13 +10,14 @@ public class ButtonDoStuff : MonoBehaviour {
     public InputField participantID;
     public InputField cubeset;
     public InputField arrangement;
-    private ParticipantStatus ps = ParticipantStatus.GetInstance();
+    private ParticipantStatus ps;
 
     // Use this for initialization
     // for the ui to work properly the canvas must use Render Mode "Screen Space - Overlay"
     // this is causing a warning to show up in unity's editor but this has no effect as 
     // we don't want the participant to see the UI
     void Start () {
+        ps = ParticipantStatus.GetInstance();
         apply.onClick.AddListener(SetParticipantCondition);
     }
 

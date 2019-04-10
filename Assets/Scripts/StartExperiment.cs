@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class StartExperiment : MonoBehaviour {
     public string NextScene;
     public Button apply;
-    private ParticipantStatus ps = ParticipantStatus.GetInstance();
+    private ParticipantStatus ps;
 
     // Use this for initialization
     // for the ui to work properly the canvas must use Render Mode "Screen Space - Overlay"
@@ -15,6 +15,7 @@ public class StartExperiment : MonoBehaviour {
     // we don't want the participant to see the UI
     void Start()
     {
+        ps = ParticipantStatus.GetInstance();
         apply.onClick.AddListener(StartExperimentListener);
     }
 

@@ -4,7 +4,12 @@ public class GetChoice : MonoBehaviour {
     public Valve.VR.InteractionSystem.Hand leftController;
     public Valve.VR.InteractionSystem.Hand rightController;
     public string choice;
-    private ParticipantStatus ps = ParticipantStatus.GetInstance();
+    private ParticipantStatus ps;
+
+    private void Start()
+    {
+        ps = ParticipantStatus.GetInstance();
+    }
 
     void OnTriggerStay(Collider other) {
         if (leftController.controller.GetHairTriggerUp() || rightController.controller.GetHairTriggerUp())
