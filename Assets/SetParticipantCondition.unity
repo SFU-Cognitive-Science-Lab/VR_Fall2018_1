@@ -1986,6 +1986,11 @@ Prefab:
       propertyPath: m_AdditionalShaderChannelsFlag
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 223960501901978562, guid: a0e32d6de9dff7340892a433ac9f9fbb,
+        type: 2}
+      propertyPath: m_PixelPerfect
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a0e32d6de9dff7340892a433ac9f9fbb, type: 2}
   m_IsPrefabAsset: 0

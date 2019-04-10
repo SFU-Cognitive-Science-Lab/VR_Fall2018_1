@@ -10,11 +10,12 @@ public class GetPreviousParticipant : MonoBehaviour {
     public InputField participantID;
     public InputField cubeset;
     public InputField arrangement;
-    private ParticipantStatus ps = ParticipantStatus.GetInstance();
+    private ParticipantStatus ps;
 
     // Use this for initialization
     void Start()
     {
+        ps = ParticipantStatus.GetInstance();
         button.onClick.AddListener(PreviousParticipantListener);
     }
 

@@ -6,10 +6,11 @@ using UnityEngine.SceneManagement;
 public class StartTrial : MonoBehaviour {
     public Valve.VR.InteractionSystem.Hand leftController;
     public Valve.VR.InteractionSystem.Hand rightController;
-    private ParticipantStatus ps = ParticipantStatus.GetInstance();
+    private ParticipantStatus ps;
 
     public void Start()
     {
+        ps = ParticipantStatus.GetInstance();
         ps.IncTrial();
     }
 
