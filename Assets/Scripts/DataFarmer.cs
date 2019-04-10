@@ -31,14 +31,14 @@ public class DataFarmer
     private static DataFarmer me = null;
 
     // buffer for incoming data
-    private List<IDataFarmerObject> data = new List<IDataFarmerObject>();
+    private List<IDataFarmerObject> data;
 
     // SET BUFFER THRESHOLD WHICH, WHEN MET, WILL STREAM DATA CHUNKS OUTWARD
     // this can be overridden from the config file
     private static int BUFFER_FULL = 10;
     private bool ForceSave = false;
-    private Mutex SaveMutex = new Mutex();
-    private AutoResetEvent Wait = new AutoResetEvent(false);
+    private Mutex SaveMutex;
+    private AutoResetEvent Wait;
     private bool Running = false;
     private Thread SaveThread;
     private static int SAVE_RETRIES = 5;
@@ -425,7 +425,7 @@ public class DataFarmer
             string content = null;
             try
             {
-                webClient.DownloadString(makeNonce().Uri(string.Format("{0}/login", REMOTE_URI)));
+                content = webClient.DownloadString(makeNonce().Uri(string.Format("{0}/login", REMOTE_URI)));
                 webClientValid = WebClientState.CONNECTED;
             }
             catch (Exception e)
