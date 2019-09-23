@@ -1,0 +1,19 @@
+See: 
+https://thoughtbot.com/blog/how-to-git-with-unity
+https://git-lfs.github.com/
+https://github.com/github/gitignore/blob/master/Unity.gitignore
+
+This step is needed for adding a new remote repository
+  git remote add github git@github.com:SFU-Cognitive-Science-Lab/VR_Fall2018_1.git
+  git lfs install
+  git checkout vr
+  git add .gitattributes <- needed for lfs to work properly
+
+
+Shut down unity before this step
+  517  git add .
+  528  git commit -m'mass commit after installing https://git-lfs.github.com/'
+  529  git push github  vr
+
+Now the "vr" branch will have the most recent version of the unity VR project from last year.
+To clone use 
