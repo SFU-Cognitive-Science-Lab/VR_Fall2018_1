@@ -1,0 +1,2 @@
+C:\Users\CSLUser\Desktop\Unity Desktop\VR_Fall2018_1\obj\Debug\TestS.csprojAssemblyReference.cache
+C:\Users\CSLUser\Desktop\Unity Desktop\VR_Fall2018_1\obj\Debug\TestS.csproj.CoreCompileInputs.cache
