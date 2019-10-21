@@ -329,7 +329,7 @@ public class DataFarmer
                         if (participant > -1 && o.GetParticipant() != participant)
                         {
                             retLoc = SaveLocally(participant, dataString);
-                            retRem = SaveRemotely(dataString);
+                            retRem = SaveRemotely(participant, dataString);
                             if (retLoc == false && retRem == false)
                             {
                                 Debug.Log("NO DATA COULD BE SAVED!");
@@ -345,7 +345,7 @@ public class DataFarmer
                     if (retLoc || retRem)
                     {
                         retLoc = SaveLocally(participant, dataString);
-                        retRem = SaveRemotely(dataString);
+                        retRem = SaveRemotely(participant, dataString);
                         if (!(retLoc || retRem))
                         {
                             Debug.Log("ERROR: NO DATA COULD BE SAVED!");
@@ -394,7 +394,7 @@ public class DataFarmer
     }
 
     // send remote data if we can
-    private bool SaveRemotely(string dataString)
+    private bool SaveRemotely(long participant, string dataString)
     {
         if (SAVE_TO_URL == false)
         {
@@ -406,8 +406,6 @@ public class DataFarmer
         try
         {
             if (!loggedin) Login();
-
-            long participant = ParticipantStatus.GetInstance().GetParticipant();
 
             if (loggedin && participant >= 0)
             {
