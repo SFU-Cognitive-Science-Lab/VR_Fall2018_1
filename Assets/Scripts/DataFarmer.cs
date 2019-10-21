@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -56,12 +57,19 @@ public class DataFarmer
     public static readonly string NOT_LOGGED_IN = "ERROR: not logged in";
 
     // for GetConfig below
+    // where we expect the configuration to be
+    private static string DEF_CONFIG_FILE = "experiments.config.txt";
+    private static string DEF_CONFIG_DIR = GetDesktop();
+    private static string DEF_DATA_DIR = string.Format(@"{0}\VRdata", DEF_CONFIG_DIR);
+    private static string LOCAL_LOG_DIR = DEF_DATA_DIR;
+
     public static int TRIALS = -1; // if TRIALS is <= 0 go on forever
-    public static string CONFIG_FILE;
-    private static string REMOTE_URI;
-    private static string REMOTE_SECRET;
-    private static string ARRANGEMENTS_FILE; // where to store maps of categories to cubes
-    private static long FIRSTPARTICIPANT = -1;
+    public static string CONFIG_FILE = string.Format(@"{0}\{1}", DEF_CONFIG_DIR, DEF_CONFIG_FILE);
+    private static bool SAVE_TO_URL = false;
+    private static string REMOTE_URI = "https://cslab.psyc.sfu.ca:13524";
+    private static string REMOTE_SECRET = "doorcode";
+    private static string ARRANGEMENTS_FILE = string.Format(@"{0}\{1}", DEF_CONFIG_DIR, "arrangements.json"); // where to store maps of categories to cubes
+    private static long FIRSTPARTICIPANT = 20000;
     private static string ARRANGEMENT_DIMS = "3x2"; // type of stimuli to get
     private static readonly string DEFAULT_LOG = "df.csv";
     private static string LOCAL_LOG = DefaultLog();
@@ -135,7 +143,7 @@ public class DataFarmer
 
     private static string DefaultLog()
     {
-        return string.Format(@"{0}\{1}", GetDesktop(), DEFAULT_LOG);
+        return string.Format(@"{0}\{1}", DEF_CONFIG_DIR, DEFAULT_LOG);
     }
 
     // use saved configuration data to set up external connection
@@ -144,10 +152,13 @@ public class DataFarmer
     {
         if (CONFIG_FILE == null)
         {
-            CONFIG_FILE = string.Format(@"{0}\{1}", GetDesktop(), "experiments.config.txt");
+            CONFIG_FILE = string.Format(@"{0}\{1}", DEF_CONFIG_DIR, DEF_CONFIG_FILE);
         }
-
-        if (!File.Exists(CONFIG_FILE)) return;
+        if (!File.Exists(CONFIG_FILE))
+        {
+            Debug.Log("Config file missing.");
+            return;
+        }
 
         Regex linePat = new Regex(@"(?<name>\w+)[=:\s](?<value>.*)");
         using (StreamReader conf = File.OpenText(CONFIG_FILE))
@@ -170,8 +181,10 @@ public class DataFarmer
                 switch (name)
                 {
                     case "url": case "uri": REMOTE_URI = value; break;
+                    case "savetourl": SAVE_TO_URL = (value.StartsWith("y") ? true : false); break;
                     case "secret": case "password": REMOTE_SECRET = value; break;
                     case "log": LOCAL_LOG = value; break;
+                    case "logdir": LOCAL_LOG_DIR = value; break;
                     case "buffer": BUFFER_FULL = int.Parse(value); break;
                     case "arrangements": ARRANGEMENTS_FILE = value; break;
                     case "trials":
@@ -205,6 +218,7 @@ public class DataFarmer
         }
     }
 
+    // no uses of this method, consider removing it
     // use this method to reset the configuration file before 
     public DataFarmer SetConfigFile(string fname)
     {
@@ -223,6 +237,7 @@ public class DataFarmer
     // this must exist for the experiment to run
     public void LoadCubes()
     {
+        Debug.Log(ARRANGEMENTS_FILE);
         if (!File.Exists(ARRANGEMENTS_FILE))
         {
             if (!ImportCubes())
@@ -306,18 +321,35 @@ public class DataFarmer
                     // Serialize data structure
                     SaveMutex.WaitOne();
                     string dataString = "";
+                    bool retLoc = true;
+                    bool retRem = true;
+                    long participant = -1;
                     foreach (IDataFarmerObject o in data)
                     {
+                        if (participant > -1 && o.GetParticipant() != participant)
+                        {
+                            retLoc = SaveLocally(participant, dataString);
+                            retRem = SaveRemotely(dataString);
+                            if (retLoc == false && retRem == false)
+                            {
+                                Debug.Log("NO DATA COULD BE SAVED!");
+                                break;
+                            }
+                            dataString = "";
+                        }
+                        participant = o.GetParticipant();
                         dataString += o.Serialize();
                     }
                     data.Clear();
                     SaveMutex.ReleaseMutex();
-
-                    bool retLoc = SaveLocally(dataString);
-                    bool retRem = SaveRemotely(dataString);
-                    if (!(retLoc || retRem))
+                    if (retLoc || retRem)
                     {
-                        Debug.Log("ERROR: NO DATA COULD BE SAVED!");
+                        retLoc = SaveLocally(participant, dataString);
+                        retRem = SaveRemotely(dataString);
+                        if (!(retLoc || retRem))
+                        {
+                            Debug.Log("ERROR: NO DATA COULD BE SAVED!");
+                        }
                     }
                     ForceSave = false;
                 }
@@ -330,15 +362,23 @@ public class DataFarmer
         }
     }
 
-    private bool SaveLocally(string dataString)
+    private bool SaveLocally(long participant, string dataString)
     {
         // update csv log on file path
-        if (LOCAL_LOG != null)
+
+        if (!Directory.Exists(LOCAL_LOG_DIR))
+        {
+            Directory.CreateDirectory(LOCAL_LOG_DIR);
+        }
+        string filename = participant > -1 ? 
+                            string.Format(@"{0}\{1}-{2}.csv", LOCAL_LOG_DIR, GetLocalIPAddress(), participant): 
+                            LOCAL_LOG;
+        if (filename != null)
         {
             try
             {
                 Debug.Log("Data Moving to File!");
-                using (StreamWriter file = File.AppendText(LOCAL_LOG))
+                using (StreamWriter file = File.AppendText(filename))
                 {
                     file.Write(dataString);
                 }
@@ -356,6 +396,11 @@ public class DataFarmer
     // send remote data if we can
     private bool SaveRemotely(string dataString)
     {
+        if (SAVE_TO_URL == false)
+        {
+            return false;
+        }
+
         bool saved = false;
         if (webClientValid == WebClientState.FAILED) return false;
         try
@@ -400,6 +445,20 @@ public class DataFarmer
             Debug.Log(e.Message);
         }
         return saved;
+    }
+
+    // from https://stackoverflow.com/questions/6803073/get-local-ip-address
+    public static string GetLocalIPAddress()
+    {
+        var host = Dns.GetHostEntry(Dns.GetHostName());
+        foreach (var ip in host.AddressList)
+        {
+            if (ip.AddressFamily == AddressFamily.InterNetwork)
+            {
+                return ip.ToString();
+            }
+        }
+        throw new Exception("No network adapters with an IPv4 address in the system!");
     }
 
     // various web related functions

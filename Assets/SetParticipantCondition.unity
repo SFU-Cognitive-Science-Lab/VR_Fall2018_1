@@ -985,7 +985,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 742168812}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1851744243}
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &742168812
@@ -1146,10 +1157,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67b636588fd14104eb4eae3ecd38db32, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  button: {fileID: 847805952}
-  participantID: {fileID: 1756225848}
-  cubeset: {fileID: 264375293}
-  arrangement: {fileID: 98368464}
+  button: {fileID: 0}
+  participantID: {fileID: 0}
+  cubeset: {fileID: 0}
+  arrangement: {fileID: 0}
 --- !u!1 &1216176180
 GameObject:
   m_ObjectHideFlags: 0
@@ -2031,8 +2042,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 03fb16e93da6aaf47a90a501bec98cbc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Seconds: 20
-  NextScene: TestScene
+  Seconds: 0
+  NextScene: 
 --- !u!114 &1851744248
 MonoBehaviour:
   m_ObjectHideFlags: 0
