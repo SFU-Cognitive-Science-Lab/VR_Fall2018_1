@@ -5,6 +5,8 @@ This repository represents the original source code used for the Virtual Reality
 This was developed on Unity and the HTC Vive system was the hardware used for this condition. One of the 2018
 or 2019 versions of Unity should work for building the project.
 
+See https://github.com/SFU-Cognitive-Science-Lab/FPS_Spring2019 for code for the 3d version - which largely uses the same code base as this.
+
 To avoid resource issues on the host, it is recommended to build an .exe and run the experiment using the .exe.
 See https://github.com/SFU-Cognitive-Science-Lab/InProgress/tree/master/CategoryVR/ExpConditions/VR for a sample.
 
