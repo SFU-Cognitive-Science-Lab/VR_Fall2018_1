@@ -19,4 +19,4 @@ However, when running from a stand alone .exe file the full path to the file sho
 
 The experiment depends on the NewtonSoft json library to parse the arrangements.json file.
 
-[Robin where do we find the running procedures for the experiment?]
+An example of our running procedures can be found here: (Running Procedures)[https://github.com/SFU-Cognitive-Science-Lab/VR_Fall2018_1/blob/vr/Procedures%20for%20Running%20Category.pdf]
